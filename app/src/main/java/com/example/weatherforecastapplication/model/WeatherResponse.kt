@@ -50,3 +50,31 @@ data class Clouds(
 data class Sys(
     val country: String
 )
+
+// Forecast response data class
+data class ForecastResponse(
+    val list: List<Forecast>,
+    val city: City
+)
+
+// Forecast data class for each 3-hour interval
+data class Forecast(
+    val dt: Long,
+    val main: MainForecast,
+    val weather: List<Weather>,
+    val wind: Wind,
+    val clouds: Clouds
+)
+
+// Main weather parameters specific for forecast
+data class MainForecast(
+    val temp: Double,
+    val pressure: Int,
+    val humidity: Int
+)
+
+// City data class to hold city-related information from forecast response
+data class City(
+    val name: String,
+    val country: String
+)
