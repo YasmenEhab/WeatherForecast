@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:background="@color/baby_blue"
+    android:layout_height="match_parent">
+
+    <!-- Lottie Animation for Background -->
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/lottie_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop"
+        android:repeatCount="infinite"
+        android:visibility="visible" />
+
+    <!-- City Name and Date -->
+    <TextView
+        android:id="@+id/text_city_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="London"
+        android:textSize="24sp"
+        android:textColor="@android:color/white"
+        android:gravity="center"
+        android:textStyle="bold"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="100dp"/>
+
+    <TextView
+        android:id="@+id/text_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Monday, October 23"
+        android:textColor="@android:color/white"
+        android:gravity="center"
+        android:textSize="16sp"
+        android:paddingTop="4dp"
+        android:layout_below="@id/text_city_name"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- Current Temperature -->
+    <TextView
+        android:id="@+id/text_current_temp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="20°C"
+        android:textSize="72sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/white"
+        android:gravity="center"
+        android:paddingTop="16dp"
+        android:layout_below="@id/text_date"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- Weather Condition (Clear Sky, Cloudy) -->
+    <TextView
+        android:id="@+id/text_weather_condition"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Clear Sky"
+        android:textSize="18sp"
+        android:textColor="@android:color/white"
+        android:gravity="center"
+        android:paddingTop="8dp"
+        android:layout_below="@id/text_current_temp"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- Hourly Forecast -->
+    <HorizontalScrollView
+        android:id="@+id/horizontalScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="24dp"
+        android:layout_below="@id/text_weather_condition">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <!-- Repeat this block for each hourly forecast -->
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:padding="8dp">
+
+                <TextView
+                    android:id="@+id/text_hour_time"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12 PM"
+                    android:textSize="14sp"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"/>
+
+                <ImageView
+                    android:id="@+id/image_weather_icon"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    />
+                <!-- android:src="@drawable/ic_sunny" -->
+
+                <TextView
+                    android:id="@+id/text_hour_temp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="18°C"
+                    android:textSize="16sp"
+                    android:textColor="@android:color/white"
+                    android:gravity="center"/>
+            </LinearLayout>
+        </LinearLayout>
+    </HorizontalScrollView>
+
+    <!-- Daily Forecast for Next 7 Days -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="24dp"
+        android:layout_below="@id/horizontalScrollView">
+
+        <!-- Repeat this block for each day forecast -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="8dp"
+            >
+
+            <TextView
+                android:id="@+id/text_day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Monday"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"/>
+
+            <ImageView
+                android:id="@+id/image_daily_weather_icon"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                />
+            <!-- android:src="@drawable/ic_sunny" -->
+
+            <TextView
+                android:id="@+id/text_temp_high"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="20°C"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"/>
+
+            <TextView
+                android:id="@+id/text_temp_low"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="14°C"
+                android:textSize="16sp"
+                android:textColor="@android:color/white"/>
+        </LinearLayout>
+    </LinearLayout>
+
+</RelativeLayout>
