@@ -1,5 +1,6 @@
 package com.example.weatherforecastapplication.home.view
 
+import HourlyForecastAdapter
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
@@ -9,6 +10,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherforecastapplication.R
+import com.example.weatherforecastapplication.databinding.ActivityMainBinding
 import com.example.weatherforecastapplication.home.viewmodel.HomeViewModel
 import com.example.weatherforecastapplication.home.viewmodel.HomeViewModelFactory
 import com.example.weatherforecastapplication.model.Forecast
@@ -20,13 +22,21 @@ import com.example.weatherforecastapplication.network.WeatherService
 
 class MainActivity : AppCompatActivity() {
 
+    // Declare the binding variable
+    private lateinit var binding: ActivityMainBinding
+
     private lateinit var viewModel: HomeViewModel
     private lateinit var viewModelFactory: HomeViewModelFactory
     private lateinit var hourlyForecastAdapter: HourlyForecastAdapter
+    private lateinit var dailyForecastAdapter: DailyForecastAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        // Initialize the binding object
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
         // Initialize the repository
         val weatherRepository = WeatherRepositoryImpl.getInstance(
@@ -41,6 +51,9 @@ class MainActivity : AppCompatActivity() {
 
         // Initialize RecyclerView for hourly forecast
         initHourlyRecyclerView()
+
+        // Initialize Daily RecyclerView
+        initDailyRecyclerView()
 
         // Fetch weather for a city (you can change the city and units as required)
         viewModel.fetchWeather("London", "metric")
@@ -77,25 +90,43 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+
+        // Observe daily forecast data
+        lifecycleScope.launchWhenStarted {
+            viewModel.dailyForecast.collect { dailyForecastResponse ->
+                dailyForecastResponse?.let { forecasts ->
+                    // Submit the forecasts to the adapter
+                    dailyForecastAdapter.submitList(forecasts)
+                }
+            }
+        }
     }
 
     // Function to update the UI with weather data
     private fun updateWeatherUI(weather: WeatherResponse) {
         // Example UI updates (you should map your actual TextView IDs)
-        findViewById<TextView>(R.id.text_city_name).text = weather.name
-        findViewById<TextView>(R.id.text_weather_condition).text = weather.weather[0].description
-        findViewById<TextView>(R.id.text_current_temp).text = "${weather.main.temp} °C"
        // findViewById<TextView>(R.id.tvHumidity).text = "${weather.main.humidity} %"
         //findViewById<TextView>(R.id.tvWindSpeed).text = "${weather.wind.speed} m/s"
        // findViewById<TextView>(R.id.tvWeatherDescription).text = weather.weather[0].description
         // etc. for other fields like pressure, clouds, etc.
 
+        binding.textCityName.text = weather.name
+        binding.textWeatherCondition.text = weather.weather[0].description
+        binding.textCurrentTemp.text = "${weather.main.temp} °C"
+
     }
 
     private fun initHourlyRecyclerView() {
         hourlyForecastAdapter = HourlyForecastAdapter()
-        val hourlyRecyclerView: RecyclerView = findViewById(R.id.hourlyForecastRecyclerView)
-        hourlyRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        hourlyRecyclerView.adapter = hourlyForecastAdapter
+        binding.hourlyForecastRecyclerView.layoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        binding.hourlyForecastRecyclerView.adapter = hourlyForecastAdapter
     }
+
+    private fun initDailyRecyclerView() {
+        dailyForecastAdapter = DailyForecastAdapter()
+        binding.dailyForecastRecyclerView.layoutManager = LinearLayoutManager(this)
+        binding.dailyForecastRecyclerView.adapter = dailyForecastAdapter
+    }
+
+   
 }
