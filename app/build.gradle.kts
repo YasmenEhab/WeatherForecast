@@ -80,5 +80,13 @@ dependencies {
 
     implementation ("com.airbnb.android:lottie:6.0.1")
 
+    implementation ("com.google.android.gms:play-services-location:21.3.0")
+
+// Navigation component
+    implementation ("androidx.navigation:navigation-fragment-ktx:2.7.3")
+    implementation ("androidx.navigation:navigation-ui-ktx:2.7.3")
+
+// Material Design
+    implementation ("com.google.android.material:material:1.10.0")
 
 }

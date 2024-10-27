@@ -24,7 +24,9 @@ class HomeViewModel(private val repo: WeatherRepository) : ViewModel() {
     private val _dailyForecast = MutableStateFlow<List<Forecast>?>(null)
     val dailyForecast: StateFlow<List<Forecast>?> = _dailyForecast
 
-    private val apiKey = "7135fce85546c3c812b6e29c55b879cf"
+    //private val apiKey = "7135fce85546c3c812b6e29c55b879cf"
+    private val apiKey = "58016d418401e5a0e8e9baef8d569514"
+
 
     // Fetch current weather
     fun fetchWeather(city: String, units: String) {

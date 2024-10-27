@@ -3,4 +3,5 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="baby_blue">#0099CC</color>
+    <color name="semi_transparent_nav">#80FFFFFF</color>
 </resources>
