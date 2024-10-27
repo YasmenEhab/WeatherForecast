@@ -13,6 +13,7 @@ import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
+import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -21,6 +22,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.weatherforecastapplication.R
 import com.example.weatherforecastapplication.databinding.FragmentHomeBinding
+import com.example.weatherforecastapplication.home.viewmodel.ApiState
 import com.example.weatherforecastapplication.home.viewmodel.HomeViewModel
 import com.example.weatherforecastapplication.home.viewmodel.HomeViewModelFactory
 import com.example.weatherforecastapplication.model.Forecast
@@ -74,14 +76,26 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         initHourlyRecyclerView()
         initDailyRecyclerView()
 
+        // Initialize UI visibility
+        initUI()
+
         geocoder = Geocoder(requireContext(), Locale.getDefault())
 
         // Observe weather data
         lifecycleScope.launchWhenStarted {
-            viewModel.weatherData.collect { weatherResponse ->
-                weatherResponse?.let {
-                    // Update UI with weather data
-                    updateWeatherUI(it)
+            viewModel.weatherData.collect { state  ->
+                when (state) {
+                    is ApiState.Loading -> showLoading(true)
+                    is ApiState.Success -> {
+                        showLoading(false)
+                        updateWeatherUI(state.weatherResponse)
+                        showMainContent(true)
+                    }
+                    is ApiState.Failure -> {
+                        showLoading(false)
+                        showError(state.message)
+                        showMainContent(false) // Hide main content in case of error
+                    }
                 }
             }
         }
@@ -204,5 +218,23 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun enableLocationServices() {
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         startActivity(intent)
+    }
+    private fun initUI() {
+        // Initially hide main content until data is loaded
+        binding.mainContentLayout.visibility = View.GONE
+        binding.progressBar.visibility = View.GONE
+    }
+    private fun showMainContent(isVisible: Boolean) {
+        binding.mainContentLayout.visibility = if (isVisible) View.VISIBLE else View.GONE
+    }
+
+    private fun showLoading(isLoading: Boolean) {
+        binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
+    }
+    private fun showError(message: String) {
+        binding.textError.apply {
+            text = message
+            visibility = View.VISIBLE
+        }
     }
 }

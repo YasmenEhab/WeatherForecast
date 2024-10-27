@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 
 class HomeViewModel(private val repo: WeatherRepository) : ViewModel() {
 
-    private val _weatherData = MutableStateFlow<WeatherResponse?>(null)
-    val weatherData: StateFlow<WeatherResponse?> = _weatherData
+    private val _weatherData = MutableStateFlow<ApiState>(ApiState.Loading)
+    val weatherData: StateFlow<ApiState> = _weatherData
 
     // StateFlow for 3-hour forecast data
     private val _threeHourForecast = MutableStateFlow<List<Forecast>?>(null)
@@ -30,17 +30,18 @@ class HomeViewModel(private val repo: WeatherRepository) : ViewModel() {
 
     // Fetch current weather
     fun fetchWeather(city: String, units: String) {
+        _weatherData.value = ApiState.Loading // Set to Loading before fetching data
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Fetch weather from repository and collect the flow
                 repo.getWeatherInfo(city, apiKey, units).collect { weatherResponse ->
                     Log.d("HomeViewModel", "Current weather: $weatherResponse")
                     // Emit the weather response to the StateFlow
-                    _weatherData.value = weatherResponse
-                }
+                    _weatherData.value = ApiState.Success(weatherResponse)                }
             } catch (e: Exception) {
-                //throw e
-                // Handle exceptions (e.g., show error message to UI)
+                Log.e("HomeViewModel", "Error fetching weather: ${e.message}")
+                _weatherData.value = ApiState.Failure(e.message ?: "An unknown error occurred")
+
             }
         }
     }
