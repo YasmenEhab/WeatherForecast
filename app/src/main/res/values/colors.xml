@@ -4,4 +4,9 @@
     <color name="white">#FFFFFFFF</color>
     <color name="baby_blue">#0099CC</color>
     <color name="semi_transparent_nav">#80FFFFFF</color>
+
+    <color name="back_1">#161c2a</color>
+    <color name="back_2">#1a2332</color>
+    <color name="yellow">#fdd020</color>
+
 </resources>

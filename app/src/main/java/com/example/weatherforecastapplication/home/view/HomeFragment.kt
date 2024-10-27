@@ -155,6 +155,24 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         binding.textCityName.text = weather.name
         binding.textWeatherCondition.text = weather.weather[0].description
         binding.textCurrentTemp.text = "${weather.main.temp.toInt()} °C"
+
+        // Update the weather icon based on the weather condition code
+        val iconResId = getWeatherIconResId(weather.weather[0].id)
+        binding.imageWeatherCondition.setImageResource(iconResId) // Assuming you have an ImageView for the icon
+
+    }
+
+    private fun getWeatherIconResId(conditionId: Int): Int {
+        return when (conditionId) {
+            in 200..232 -> R.drawable.storm // Thunderstorm
+            in 300..321 -> R.drawable.rainy // Drizzle
+            in 500..531 -> R.drawable.rainy // Rain
+            in 600..622 -> R.drawable.snowy // Snow
+            in 701..781 -> R.drawable.cloudy_3 // Atmosphere
+            800 -> R.drawable.sun // Clear
+            in 801..804 -> R.drawable.cloudy_sunny // Clouds
+            else -> R.drawable.cloudy_3 // Default icon
+        }
     }
 
     private fun checkPermissions(): Boolean {

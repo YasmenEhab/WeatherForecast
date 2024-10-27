@@ -1,121 +1,130 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/baby_blue"
-    tools:context=".home.view.HomeFragment">
+    android:background="@color/back_1"
+    tools:context=".home.view.HomeFragment"
+    android:orientation="vertical">
 
-
-    <!-- Lottie Animation for Background -->
-    <com.airbnb.lottie.LottieAnimationView
-        android:id="@+id/lottie_background"
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleType="centerCrop"
-        android:repeatCount="infinite"
-        android:visibility="visible" />
+        android:layout_height="match_parent">
 
-    <!-- ProgressBar -->
-    <ProgressBar
-        android:id="@+id/progressBar"
-        style="?android:attr/progressBarStyle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:visibility="gone"
-        android:layout_centerInParent="true"
-        />
-
-    <!-- Error Text -->
-    <TextView
-        android:id="@+id/textError"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/holo_red_dark"
-        android:visibility="gone"
-        android:layout_gravity="center" />
-
-    <!-- Main Content Layout -->
-    <RelativeLayout
-        android:id="@+id/mainContentLayout"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:visibility="gone">
-
-        <!-- City Name and Date -->
-        <TextView
-            android:id="@+id/text_city_name"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="London"
-            android:textSize="24sp"
-            android:textColor="@android:color/white"
-            android:gravity="center"
-            android:textStyle="bold"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="100dp" />
-
-        <TextView
-            android:id="@+id/text_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Monday, October 23"
-            android:textColor="@android:color/white"
-            android:gravity="center"
-            android:textSize="16sp"
-            android:paddingTop="4dp"
-            android:layout_below="@id/text_city_name"
-            android:layout_centerHorizontal="true" />
-
-        <!-- Current Temperature -->
-        <TextView
-            android:id="@+id/text_current_temp"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="20°C"
-            android:textSize="72sp"
-            android:textStyle="bold"
-            android:textColor="@android:color/white"
-            android:gravity="center"
-            android:paddingTop="16dp"
-            android:layout_below="@id/text_date"
-            android:layout_centerHorizontal="true" />
-
-        <!-- Weather Condition -->
-        <TextView
-            android:id="@+id/text_weather_condition"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Clear Sky"
-            android:textSize="18sp"
-            android:textColor="@android:color/white"
-            android:gravity="center"
-            android:paddingTop="8dp"
-            android:layout_below="@id/text_current_temp"
-            android:layout_centerHorizontal="true" />
-
-        <!-- Hourly Forecast RecyclerView -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/hourlyForecastRecyclerView"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/text_weather_condition"
-            android:paddingTop="24dp"
-            android:orientation="horizontal"
-            tools:listitem="@layout/item_hourly_forecast" />
+            android:orientation="vertical">
 
-        <!-- Daily Forecast RecyclerView -->
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/dailyForecastRecyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/hourlyForecastRecyclerView"
-            android:paddingTop="24dp"
-            android:orientation="vertical"
-            tools:listitem="@layout/item_daily_forecast" />
-    </RelativeLayout>
+            <!-- ProgressBar -->
+            <ProgressBar
+                android:id="@+id/progressBar"
+                style="?android:attr/progressBarStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
 
+            <!-- Error Text -->
+            <TextView
+                android:id="@+id/textError"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:textColor="@android:color/holo_red_dark"
+                android:visibility="gone" />
 
-</RelativeLayout>
+            <!-- Main Content Layout -->
+            <RelativeLayout
+                android:id="@+id/mainContentLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <!-- City Name -->
+                <TextView
+                    android:id="@+id/text_city_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:text="London"
+                    android:textColor="@android:color/white"
+                    android:textStyle="bold"
+                    android:textSize="24sp"
+                    android:layout_marginTop="100dp" />
+
+                <!-- Date -->
+                <TextView
+                    android:id="@+id/text_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/text_city_name"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:paddingTop="4dp"
+                    android:text="Monday, October 23"
+                    android:textColor="@android:color/white"
+                    android:textSize="16sp" />
+
+                <!-- Weather Condition Image -->
+
+                <!-- Current Temperature -->
+                <ImageView
+                    android:id="@+id/image_weather_condition"
+                    android:layout_width="200dp"
+                    android:layout_height="200dp"
+                    android:layout_below="@id/text_date"
+                    android:layout_marginTop="20dp"
+                    android:layout_centerHorizontal="true"
+                    app:srcCompat="@drawable/cloudy_sunny" />
+
+                <TextView
+                    android:id="@+id/text_current_temp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/image_weather_condition"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:paddingTop="16dp"
+                    android:text="20°C"
+                    android:textColor="@android:color/white"
+                    android:textSize="72sp"
+                    android:textStyle="bold" />
+
+                <!-- Weather Condition -->
+                <TextView
+                    android:id="@+id/text_weather_condition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/text_current_temp"
+                    android:layout_centerHorizontal="true"
+                    android:gravity="center"
+                    android:paddingTop="8dp"
+                    android:text="Clear Sky"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp" />
+
+                <!-- Hourly Forecast RecyclerView -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/hourlyForecastRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/text_weather_condition"
+                    android:paddingTop="24dp"
+                    tools:listitem="@layout/item_hourly_forecast" />
+
+                <!-- Daily Forecast RecyclerView -->
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/dailyForecastRecyclerView"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/hourlyForecastRecyclerView"
+                    android:paddingTop="24dp"
+                    tools:listitem="@layout/item_daily_forecast" />
+
+            </RelativeLayout>
+
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

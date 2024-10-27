@@ -3,6 +3,7 @@ package com.example.weatherforecastapplication.home.viewmodel
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.weatherforecastapplication.R
 import com.example.weatherforecastapplication.model.Forecast
 import com.example.weatherforecastapplication.model.WeatherRepository
 import com.example.weatherforecastapplication.model.WeatherResponse
@@ -15,6 +16,9 @@ class HomeViewModel(private val repo: WeatherRepository) : ViewModel() {
 
     private val _weatherData = MutableStateFlow<ApiState>(ApiState.Loading)
     val weatherData: StateFlow<ApiState> = _weatherData
+
+    private val _weatherIconResource = MutableStateFlow<Int?>(null) // StateFlow for weather icon
+    val weatherIconResource: StateFlow<Int?> = _weatherIconResource
 
     // StateFlow for 3-hour forecast data
     private val _threeHourForecast = MutableStateFlow<List<Forecast>?>(null)
@@ -37,7 +41,8 @@ class HomeViewModel(private val repo: WeatherRepository) : ViewModel() {
                 repo.getWeatherInfo(city, apiKey, units).collect { weatherResponse ->
                     Log.d("HomeViewModel", "Current weather: $weatherResponse")
                     // Emit the weather response to the StateFlow
-                    _weatherData.value = ApiState.Success(weatherResponse)                }
+                    _weatherData.value = ApiState.Success(weatherResponse)
+                    updateWeatherIcon(weatherResponse)}
             } catch (e: Exception) {
                 Log.e("HomeViewModel", "Error fetching weather: ${e.message}")
                 _weatherData.value = ApiState.Failure(e.message ?: "An unknown error occurred")
@@ -76,5 +81,18 @@ class HomeViewModel(private val repo: WeatherRepository) : ViewModel() {
                 // Handle exceptions
             }
         }
+    }
+
+    // Function to determine the weather icon
+    private fun updateWeatherIcon(weatherResponse: WeatherResponse) {
+        val iconResId = when (weatherResponse.weather.firstOrNull()?.main) { // Adjust as necessary
+            "Clear" -> R.drawable.sun
+            "Clouds" -> R.drawable.cloudy_3
+            "Rain" -> R.drawable.rainy
+            "Snow" -> R.drawable.snowy
+            "Dust" -> R.drawable.wind
+            else -> R.drawable.sun // Fallback icon
+        }
+        _weatherIconResource.value = iconResId // Update the StateFlow with the new icon resource
     }
 }
