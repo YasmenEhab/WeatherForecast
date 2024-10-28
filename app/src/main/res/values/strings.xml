@@ -7,4 +7,12 @@
     <string name="Setting">Setting</string>
     <string name="favorites">Favorites</string>
     <string name="alarm">Alarm</string>
+    <string name="wind">wind</string>
+    <string name="pressure">pressure</string>
+    <string name="humidity">humidity</string>
+    <string name="weather_condition_format">Condition: %1$s</string>
+    <string name="temperature_format">%1$d °C</string> <!-- Integer -->
+    <string name="wind_speed_format">%1$.1f km/h</string> <!-- Float -->
+    <string name="pressure_format">%1$d hPa</string> <!-- Integer -->
+    <string name="humidity_format">%1$d %%</string> <!-- Integer -->
 </resources>

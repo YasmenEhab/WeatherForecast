@@ -154,12 +154,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun updateWeatherUI(weather: WeatherResponse) {
         binding.textCityName.text = weather.name
         binding.textWeatherCondition.text = weather.weather[0].description
-        binding.textCurrentTemp.text = "${weather.main.temp.toInt()} °C"
+        binding.textCurrentTemp.text = getString(R.string.temperature_format, weather.main.temp.toInt())
+        binding.Windtext.text = getString(R.string.wind_speed_format, weather.wind.speed)
+        binding.PressureValue.text = getString(R.string.pressure_format, weather.main.pressure)
+        binding.humidityUnit.text = getString(R.string.humidity_format, weather.main.humidity)
 
         // Update the weather icon based on the weather condition code
         val iconResId = getWeatherIconResId(weather.weather[0].id)
         binding.imageWeatherCondition.setImageResource(iconResId) // Assuming you have an ImageView for the icon
-
     }
 
     private fun getWeatherIconResId(conditionId: Int): Int {

@@ -5,86 +5,96 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/back_1"
-    tools:context=".home.view.HomeFragment"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    tools:context=".home.view.HomeFragment">
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <LinearLayout
+        <RelativeLayout
+            android:id="@+id/mainContentLayout"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
             <!-- ProgressBar -->
+
+            <!-- Error Text -->
             <ProgressBar
                 android:id="@+id/progressBar"
                 style="?android:attr/progressBarStyle"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
                 android:visibility="gone" />
 
-            <!-- Error Text -->
             <TextView
                 android:id="@+id/textError"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
+                android:layout_centerHorizontal="true"
                 android:textColor="@android:color/holo_red_dark"
                 android:visibility="gone" />
 
-            <!-- Main Content Layout -->
-            <RelativeLayout
-                android:id="@+id/mainContentLayout"
+            <!-- City Name -->
+            <TextView
+                android:id="@+id/text_city_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="100dp"
+                android:gravity="center"
+                android:text="city for design"
+                android:textColor="@android:color/white"
+                android:textSize="24sp"
+                android:textStyle="bold" />
+
+            <!-- Date -->
+            <TextView
+                android:id="@+id/text_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/text_city_name"
+                android:layout_centerHorizontal="true"
+                android:gravity="center"
+                android:paddingTop="4dp"
+                android:text="Monday, October 23"
+                android:textColor="@android:color/white"
+                android:textSize="16sp" />
+
+            <!-- Weather Info LinearLayout -->
+            <LinearLayout
+                android:id="@+id/weather_info_layout"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <!-- City Name -->
-                <TextView
-                    android:id="@+id/text_city_name"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_centerHorizontal="true"
-                    android:gravity="center"
-                    android:text="London"
-                    android:textColor="@android:color/white"
-                    android:textStyle="bold"
-                    android:textSize="24sp"
-                    android:layout_marginTop="100dp" />
-
-                <!-- Date -->
-                <TextView
-                    android:id="@+id/text_date"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/text_city_name"
-                    android:layout_centerHorizontal="true"
-                    android:gravity="center"
-                    android:paddingTop="4dp"
-                    android:text="Monday, October 23"
-                    android:textColor="@android:color/white"
-                    android:textSize="16sp" />
+                android:layout_height="wrap_content"
+                android:layout_below="@id/text_date"
+                android:layout_margin="16dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/background_2"
+                android:gravity="center"
+                android:orientation="vertical">
 
                 <!-- Weather Condition Image -->
-
-                <!-- Current Temperature -->
                 <ImageView
                     android:id="@+id/image_weather_condition"
                     android:layout_width="200dp"
                     android:layout_height="200dp"
-                    android:layout_below="@id/text_date"
-                    android:layout_marginTop="20dp"
-                    android:layout_centerHorizontal="true"
                     app:srcCompat="@drawable/cloudy_sunny" />
+
+                <!-- Weather Condition -->
+                <TextView
+                    android:id="@+id/text_weather_condition"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:paddingTop="8dp"
+                    android:text="Clear Sky"
+                    android:textColor="@android:color/white"
+                    android:textSize="18sp" />
 
                 <TextView
                     android:id="@+id/text_current_temp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/image_weather_condition"
-                    android:layout_centerHorizontal="true"
                     android:gravity="center"
                     android:paddingTop="16dp"
                     android:text="20°C"
@@ -92,39 +102,167 @@
                     android:textSize="72sp"
                     android:textStyle="bold" />
 
-                <!-- Weather Condition -->
-                <TextView
-                    android:id="@+id/text_weather_condition"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/text_current_temp"
-                    android:layout_centerHorizontal="true"
-                    android:gravity="center"
-                    android:paddingTop="8dp"
-                    android:text="Clear Sky"
-                    android:textColor="@android:color/white"
-                    android:textSize="18sp" />
-
-                <!-- Hourly Forecast RecyclerView -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/hourlyForecastRecyclerView"
+                <!-- LinearLayout to hold Wind, Pressure, and Humidity info -->
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_below="@id/text_weather_condition"
-                    android:paddingTop="24dp"
-                    tools:listitem="@layout/item_hourly_forecast" />
+                    android:layout_marginTop="16dp"
+                    android:orientation="horizontal"
+                    android:weightSum="1">
 
-                <!-- Daily Forecast RecyclerView -->
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/dailyForecastRecyclerView"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_below="@id/hourlyForecastRecyclerView"
-                    android:paddingTop="24dp"
-                    tools:listitem="@layout/item_daily_forecast" />
+                    <!-- Wind Info LinearLayout -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.3333"
+                        android:gravity="bottom"
+                        android:orientation="vertical">
 
-            </RelativeLayout>
+                        <ImageView
+                            android:id="@+id/windimage"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@drawable/wind" />
 
-        </LinearLayout>
+                        <TextView
+                            android:id="@+id/Windtext"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:shadowColor="@color/black"
+                            android:shadowDx="1"
+                            android:shadowDy="1"
+                            android:shadowRadius="3"
+                            android:text="-Km"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/WindValue"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:shadowColor="@color/black"
+                            android:shadowDx="1"
+                            android:shadowDy="1"
+                            android:shadowRadius="3"
+                            android:text="@string/wind"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Pressure Info LinearLayout -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.3333"
+                        android:gravity="bottom"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/pressureimage"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_vertical"
+                            app:srcCompat="@drawable/pressure_white1" />
+
+                        <TextView
+                            android:id="@+id/PressureValue"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:shadowColor="@color/black"
+                            android:shadowDx="1"
+                            android:shadowDy="1"
+                            android:shadowRadius="3"
+                            android:text="-hpa"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/Pressure"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:shadowColor="@color/black"
+                            android:shadowDx="1"
+                            android:shadowDy="1"
+                            android:shadowRadius="3"
+                            android:text="@string/pressure"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+
+                    <!-- Humidity Info LinearLayout -->
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="match_parent"
+                        android:layout_weight="0.3333"
+                        android:gravity="bottom"
+                        android:orientation="vertical">
+
+                        <ImageView
+                            android:id="@+id/imageView4"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            app:srcCompat="@drawable/humidity" />
+
+                        <TextView
+                            android:id="@+id/humidityUnit"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:shadowColor="@color/black"
+                            android:shadowDx="1"
+                            android:shadowDy="1"
+                            android:shadowRadius="3"
+                            android:text="-%"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="18sp" />
+
+                        <TextView
+                            android:id="@+id/Wind"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:shadowColor="@color/black"
+                            android:shadowDx="1"
+                            android:shadowDy="1"
+                            android:shadowRadius="3"
+                            android:text="@string/humidity"
+                            android:textAlignment="center"
+                            android:textColor="@color/white"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+            </LinearLayout>
+
+            <!-- Hourly Forecast RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/hourlyForecastRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/weather_info_layout"
+                android:layout_margin="16dp"
+                android:layout_marginTop="20dp"
+                android:background="@drawable/background_2"
+                android:paddingTop="24dp"
+                tools:listitem="@layout/item_hourly_forecast" />
+
+            <!-- Daily Forecast RecyclerView -->
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/dailyForecastRecyclerView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/hourlyForecastRecyclerView"
+                android:layout_margin="16dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/background_2"
+                tools:listitem="@layout/item_daily_forecast" />
+
+        </RelativeLayout>
     </ScrollView>
 </LinearLayout>
