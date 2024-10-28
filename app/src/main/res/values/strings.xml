@@ -14,5 +14,30 @@
     <string name="temperature_format">%1$d °C</string> <!-- Integer -->
     <string name="wind_speed_format">%1$.1f km/h</string> <!-- Float -->
     <string name="pressure_format">%1$d hPa</string> <!-- Integer -->
-    <string name="humidity_format">%1$d %%</string> <!-- Integer -->
+    <string name="humidity_format">%1$d %%</string>
+    <string name="find_a_city">Find a City</string>
+    <string name="pick_location">Pick Location</string>
+    <string name="City_name">City name</string>
+    <string name="setting">setting</string>
+    <string name="language">language</string>
+    <string name="temp_unit">temp_unit</string>
+    <string name="location">location</string>
+    <string name="wind_speed_unit">wind_speed_unit</string> <!-- Integer -->
+    <string-array name="languages_array">
+        <item>Arabic</item>
+        <item>English</item>
+    </string-array>
+    <string-array name="temp_units_array">
+        <item>Celsius</item>
+        <item>Kelvin</item>
+        <item>Fahrenheit</item>
+    </string-array>
+    <string-array name="location_options_array">
+        <item>GPS</item>
+        <item>Map</item>
+    </string-array>
+    <string-array name="wind_speed_units_array">
+        <item>Meter/sec</item>
+        <item>Mile/hour</item>
+    </string-array>
 </resources>
