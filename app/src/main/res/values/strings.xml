@@ -24,8 +24,8 @@
     <string name="location">location</string>
     <string name="wind_speed_unit">wind_speed_unit</string> <!-- Integer -->
     <string-array name="languages_array">
-        <item>Arabic</item>
         <item>English</item>
+        <item>Arabic</item>
     </string-array>
     <string-array name="temp_units_array">
         <item>Celsius</item>

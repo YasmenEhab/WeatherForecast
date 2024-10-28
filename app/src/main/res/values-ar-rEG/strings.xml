@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">تطبيق توقعات الطقس</string>
+    <string name="city_name">اسم المدينة</string>
+    <string name="hello_blank_fragment">مرحبًا بك في الصفحة الفارغة</string>
+    <string name="home">الرئيسية</string>
+    <string name="favorites">المفضلة</string>
+    <string name="alarm">المنبه</string>
+    <string name="wind">الرياح</string>
+    <string name="pressure">الضغط</string>
+    <string name="humidity">الرطوبة</string>
+    <string name="weather_condition_format">الحالة: %1$s</string>
+    <string name="temperature_format">%1$d °س</string> <!-- Integer -->
+    <string name="wind_speed_format">%1$.1f كم/ساعة</string> <!-- Float -->
+    <string name="pressure_format">%1$d هكتوباسكال</string> <!-- Integer -->
+    <string name="humidity_format">%1$d %%</string>
+    <string name="find_a_city">ابحث عن مدينة</string>
+    <string name="pick_location">اختر موقعًا</string>
+    <string name="setting">الإعدادات</string>
+    <string name="language">اللغة</string>
+    <string name="temp_unit">وحدة الحرارة</string>
+    <string name="location">الموقع</string>
+    <string name="wind_speed_unit">وحدة سرعة الرياح</string>
+
+    <string-array name="languages_array">
+        <item>الإنجليزية</item>
+        <item>العربية</item>
+    </string-array>
+
+    <string-array name="temp_units_array">
+        <item>درجة مئوية</item>
+        <item>كلفن</item>
+        <item>فهرنهايت</item>
+    </string-array>
+
+    <string-array name="location_options_array">
+        <item>GPS</item>
+        <item>خريطة</item>
+    </string-array>
+
+    <string-array name="wind_speed_units_array">
+        <item>متر/ثانية</item>
+        <item>ميل/ساعة</item>
+    </string-array>
+</resources>

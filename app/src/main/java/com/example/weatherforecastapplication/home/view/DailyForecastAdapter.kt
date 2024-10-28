@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.weatherforecastapplication.R
 import com.example.weatherforecastapplication.databinding.ItemDailyForecastBinding
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -23,7 +24,7 @@ class DailyForecastDiffUtil : DiffUtil.ItemCallback<Forecast>() {
 }
 
 // Adapter class for daily forecasts
-class DailyForecastAdapter : ListAdapter<Forecast, DailyForecastAdapter.DailyViewHolder>(
+class DailyForecastAdapter(private val languageOption: String) : ListAdapter<Forecast, DailyForecastAdapter.DailyViewHolder>(
     DailyForecastDiffUtil()
 ) {
 
@@ -48,7 +49,12 @@ class DailyForecastAdapter : ListAdapter<Forecast, DailyForecastAdapter.DailyVie
 
         // Set "Today" for the first item, otherwise use the actual day name
         val displayDay = if (position == 0) {
-            "Today"
+            // Check the language option
+            if (languageOption == "ar") {
+                "اليوم" // Arabic for "Today"
+            } else {
+                "Today" // Default to English
+            }
         } else {
             dayFormat.format(date)
         }
@@ -56,7 +62,7 @@ class DailyForecastAdapter : ListAdapter<Forecast, DailyForecastAdapter.DailyVie
         holder.binding.textDay.text = displayDay
 
         // Set the high and low temperatures
-        holder.binding.textTemp.text = "${forecast.main.temp.toInt()}°C"
+        holder.binding.textTemp.text = holder.binding.root.context.getString(R.string.temperature_format, forecast.main.temp.toInt())
 
 
         // Load the weather icon (if applicable)

@@ -10,16 +10,20 @@ import retrofit2.http.Query
 interface WeatherService {
     @GET("data/2.5/weather")
     suspend fun getCurrentWeather(
-        @Query("q") city: String,    // City name (e.g., "London")
-        @Query("appid") apiKey: String,  // API key for authentication
-        @Query("units") units: String   // Units (metric, imperial, etc.)
+        @Query("q") city: String,             // City name (e.g., "London")
+        @Query("appid") apiKey: String,      // API key for authentication
+        @Query("units") units: String,       // Units (metric, imperial, etc.)
+        @Query("lang") lang: String          // Language (e.g., "en" for English, "ar" for Arabic)
+
     ): WeatherResponse
 
     @GET("data/2.5/forecast")
     suspend fun getWeatherForecast(
         @Query("q") city: String,
         @Query("appid") appId: String,
-        @Query("units") units: String   // Units (metric, imperial, etc.)
+        @Query("units") units: String,   // Units (metric, imperial, etc.)
+        @Query("lang") lang: String          // Language (e.g., "en" for English, "ar" for Arabic)
+
     ): ForecastResponse
 
 

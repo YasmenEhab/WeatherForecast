@@ -1,5 +1,6 @@
 package com.example.weatherforecastapplication.home.viewmodel
 
+import android.content.SharedPreferences
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,7 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 
-class HomeViewModel(private val repo: WeatherRepository) : ViewModel() {
+class HomeViewModel(private val repo: WeatherRepository ,  private val sharedPreferences: SharedPreferences) : ViewModel() {
 
     private val _weatherData = MutableStateFlow<ApiState>(ApiState.Loading)
     val weatherData: StateFlow<ApiState> = _weatherData
@@ -31,14 +32,29 @@ class HomeViewModel(private val repo: WeatherRepository) : ViewModel() {
     //private val apiKey = "7135fce85546c3c812b6e29c55b879cf"
     private val apiKey = "58016d418401e5a0e8e9baef8d569514"
 
+    private val city = "london"
+
+    init {
+        loadPreferencesAndFetchWeather()
+    }
+
+    // Load preferences and fetch weather data
+    private fun loadPreferencesAndFetchWeather() {
+        val units = sharedPreferences.getString("TEMPERATURE_UNIT", "metric") ?: "metric"
+        val lang = sharedPreferences.getString("LANGUAGE", "en") ?: "en"
+
+        fetchWeather(city, units, lang)
+        fetchThreeHourForecast(city, units, lang)
+        fetchDailyForecast(city, units, lang)
+    }
 
     // Fetch current weather
-    fun fetchWeather(city: String, units: String) {
+    fun fetchWeather(city: String, units: String, lang: String) {
         _weatherData.value = ApiState.Loading // Set to Loading before fetching data
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Fetch weather from repository and collect the flow
-                repo.getWeatherInfo(city, apiKey, units).collect { weatherResponse ->
+                repo.getWeatherInfo(city, apiKey, units,lang).collect { weatherResponse ->
                     Log.d("HomeViewModel", "Current weather: $weatherResponse")
                     // Emit the weather response to the StateFlow
                     _weatherData.value = ApiState.Success(weatherResponse)
@@ -52,11 +68,11 @@ class HomeViewModel(private val repo: WeatherRepository) : ViewModel() {
     }
 
     // Fetch 3-hour forecast data
-    fun fetchThreeHourForecast(city: String, units: String) {
+    fun fetchThreeHourForecast(city: String, units: String, lang: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Fetch 3-hour forecast from repository and collect the flow
-                repo.getThreeHourForecast(city, apiKey, units).collect { forecastList ->
+                repo.getThreeHourForecast(city, apiKey, units, lang).collect { forecastList ->
                     Log.d("HomeViewModel", "3-hour forecast: $forecastList")
                     // Emit the 3-hour forecast to the StateFlow
                     _threeHourForecast.value = forecastList
@@ -68,11 +84,11 @@ class HomeViewModel(private val repo: WeatherRepository) : ViewModel() {
     }
 
     // Fetch daily forecast data
-    fun fetchDailyForecast(city: String, units: String) {
+    fun fetchDailyForecast(city: String, units: String, lang: String) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Fetch daily forecast from repository and collect the flow
-                repo.getDailyForecast(city, apiKey, units).collect { dailyList ->
+                repo.getDailyForecast(city, apiKey, units, lang).collect { dailyList ->
                     Log.d("HomeViewModel", "Daily forecast: $dailyList")
                     // Emit the daily forecast to the StateFlow
                     _dailyForecast.value = dailyList

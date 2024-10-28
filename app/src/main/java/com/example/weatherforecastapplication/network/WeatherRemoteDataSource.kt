@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface WeatherRemoteDataSource {
 
-    suspend  fun getWeatherInfoOverNetwork(city: String, apiKey: String, units: String):  Flow<WeatherResponse>
-    suspend fun getWeatherForecastOverNetwork(city: String, apiKey: String, units: String): Flow<ForecastResponse>
+    suspend  fun getWeatherInfoOverNetwork(city: String, apiKey: String, units: String, lang: String) :  Flow<WeatherResponse>
+    suspend fun getWeatherForecastOverNetwork(city: String, apiKey: String, units: String, lang: String): Flow<ForecastResponse>
 
     }

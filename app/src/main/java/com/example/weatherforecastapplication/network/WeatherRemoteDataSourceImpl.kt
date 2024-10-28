@@ -9,11 +9,11 @@ import kotlinx.coroutines.flow.flow
 class WeatherRemoteDataSourceImpl(private val apiService: WeatherService) : WeatherRemoteDataSource {
 
     /* make function return Flow and and emit  */
-    override suspend fun getWeatherInfoOverNetwork(city: String, apiKey: String, units: String): Flow<WeatherResponse> {
+    override suspend fun getWeatherInfoOverNetwork(city: String, apiKey: String, units: String , lang: String): Flow<WeatherResponse> {
         return flow {
             try {
                 // Make the API call to get the weather information
-                val response = apiService.getCurrentWeather(city, apiKey, units)
+                val response = apiService.getCurrentWeather(city, apiKey, units, lang)
 
                 // Emit the result to the flow
                 emit(response)
@@ -24,11 +24,11 @@ class WeatherRemoteDataSourceImpl(private val apiService: WeatherService) : Weat
         }
     }
     /* Fetch weather forecast for the next 5 days and emit as Flow */
-    override suspend fun getWeatherForecastOverNetwork(city: String, apiKey: String, units: String): Flow<ForecastResponse> {
+    override suspend fun getWeatherForecastOverNetwork(city: String, apiKey: String, units: String, lang: String): Flow<ForecastResponse> {
         return flow {
             try {
                 // Make the API call to get the weather forecast
-                val response = apiService.getWeatherForecast(city, apiKey, units)
+                val response = apiService.getWeatherForecast(city, apiKey, units, lang)
 
                 // Emit the result to the flow
                 emit(response)

@@ -1,9 +1,11 @@
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.weatherforecastapplication.R
 import com.example.weatherforecastapplication.databinding.ItemHourlyForecastBinding
 import com.example.weatherforecastapplication.model.Forecast
 import java.text.SimpleDateFormat
@@ -37,13 +39,22 @@ class HourlyForecastAdapter : ListAdapter<Forecast, HourlyForecastAdapter.Hourly
         // Convert the timestamp to a Date object
         val date = Date(forecast.dt * 1000) // dt is in seconds, convert to milliseconds
 
-        // Extract the time from the forecast (formatted to show hours)
-        val dateFormat = SimpleDateFormat("h a", Locale.getDefault())
+        // Retrieve the current language from SharedPreferences
+        val sharedPreferences = holder.binding.root.context.getSharedPreferences("Settings", Context.MODE_PRIVATE)
+        val languageOption = sharedPreferences.getString("LANGUAGE", "en") ?: "en"
+
+        // Set the Locale based on the language option
+        val locale = if (languageOption == "ar") Locale("ar", "SA") else Locale.getDefault()
+
+
+        // Extract the time from the forecast with the appropriate locale
+        val dateFormat = SimpleDateFormat("h a", locale)
         val formattedTime = dateFormat.format(date)
         holder.binding.hourTextView.text = formattedTime
 
         // Set the temperature
-        holder.binding.tempTextView.text = "${forecast.main.temp.toInt()}°C"
+        //holder.binding.tempTextView.text = "${forecast.main.temp.toInt()}°C"
+        holder.binding.tempTextView.text = holder.binding.root.context.getString(R.string.temperature_format, forecast.main.temp.toInt())
 
         // You can set weather icons here (if applicable)
 //        Glide.with(holder.binding.imageWeatherIcon.context)

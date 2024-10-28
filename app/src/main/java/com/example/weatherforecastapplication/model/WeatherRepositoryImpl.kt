@@ -25,23 +25,23 @@ class WeatherRepositoryImpl private constructor(
         }
     }
     // Get current weather data from the remote data source
-    override suspend fun getWeatherInfo(city: String, apiKey: String, units: String): Flow<WeatherResponse> {
+    override suspend fun getWeatherInfo(city: String, apiKey: String, units: String, lang: String): Flow<WeatherResponse> {
 
-            return remoteDataSource.getWeatherInfoOverNetwork(city , apiKey ,units )
+            return remoteDataSource.getWeatherInfoOverNetwork(city , apiKey ,units , lang )
 
     }
 
     // Get 3-hour interval temperatures and process them
-    override suspend fun getThreeHourForecast(city: String, apiKey: String, units: String): Flow<List<Forecast>> {
-        return remoteDataSource.getWeatherForecastOverNetwork(city, apiKey, units).map { forecastResponse ->
+    override suspend fun getThreeHourForecast(city: String, apiKey: String, units: String, lang: String): Flow<List<Forecast>> {
+        return remoteDataSource.getWeatherForecastOverNetwork(city, apiKey, units , lang).map { forecastResponse ->
             // Extract and return the list of 3-hour forecast
             forecastResponse.list
         }
     }
 
     // Get daily temperatures by grouping forecast into days
-    override suspend fun getDailyForecast(city: String, apiKey: String, units: String): Flow<List<Forecast>> {
-        return remoteDataSource.getWeatherForecastOverNetwork(city, apiKey, units).map { forecastResponse ->
+    override suspend fun getDailyForecast(city: String, apiKey: String, units: String, lang: String): Flow<List<Forecast>> {
+        return remoteDataSource.getWeatherForecastOverNetwork(city, apiKey, units, lang).map { forecastResponse ->
             // Group by day and calculate daily temperatures
             forecastResponse.list.groupBy { it.dt / 86400 } // Group by day (86400 seconds = 1 day)
                 .map { entry -> entry.value.first() } // For simplicity, taking the first forecast of each day

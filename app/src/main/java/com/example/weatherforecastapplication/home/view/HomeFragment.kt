@@ -6,6 +6,7 @@ import android.Manifest.permission.ACCESS_FINE_LOCATION
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
 import android.location.Geocoder
 import android.location.LocationManager
@@ -32,6 +33,8 @@ import com.example.weatherforecastapplication.network.RetrofitHelper
 import com.example.weatherforecastapplication.network.WeatherRemoteDataSourceImpl
 import com.example.weatherforecastapplication.network.WeatherService
 import com.google.android.gms.location.*
+import java.text.SimpleDateFormat
+import java.util.Date
 
 import java.util.Locale
 
@@ -55,6 +58,12 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     private var isWeatherFetched = false
 
+    // Shared Preferences
+    private lateinit var sharedPreferences: SharedPreferences
+    private lateinit var sharedPreferencesListener: SharedPreferences.OnSharedPreferenceChangeListener
+    private  var languageOption: String = "en"
+
+
     override fun onViewCreated(view: android.view.View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -66,8 +75,15 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             WeatherRemoteDataSourceImpl.getInstance(RetrofitHelper.getInstance().create(WeatherService::class.java))
         )
 
+        // Initialize SharedPreferences
+        sharedPreferences = requireContext().getSharedPreferences("Settings", Context.MODE_PRIVATE)
+        loadUserPreferences()
+
+        // Set the locale based on saved preference
+        setLocale()
+
         // Initialize ViewModelFactory with the repository
-        viewModelFactory = HomeViewModelFactory(weatherRepository)
+        viewModelFactory = HomeViewModelFactory(weatherRepository ,sharedPreferences)
 
         // Initialize ViewModel using ViewModelProvider
         viewModel = ViewModelProvider(this, viewModelFactory).get(HomeViewModel::class.java)
@@ -138,6 +154,20 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
+    private fun setLocale() {
+        val languageOption = sharedPreferences.getString("LANGUAGE", "en") ?: "en"
+        val locale = if (languageOption == "ar") {
+            Locale("ar")
+        } else {
+            Locale("en")
+        }
+
+        Locale.setDefault(locale)
+        val config = resources.configuration
+        config.setLocale(locale)
+        resources.updateConfiguration(config, resources.displayMetrics)
+    }
+
     private fun initHourlyRecyclerView() {
         hourlyForecastAdapter = HourlyForecastAdapter()
         binding.hourlyForecastRecyclerView.layoutManager =
@@ -146,18 +176,34 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     }
 
     private fun initDailyRecyclerView() {
-        dailyForecastAdapter = DailyForecastAdapter()
+        dailyForecastAdapter = DailyForecastAdapter(languageOption)
         binding.dailyForecastRecyclerView.layoutManager = LinearLayoutManager(requireContext())
         binding.dailyForecastRecyclerView.adapter = dailyForecastAdapter
     }
+    private fun displayCurrentDate() {
+        val locale = if (languageOption == "ar") {
+            Locale("ar") // Arabic
+        } else {
+            Locale("en") // Default to English
+        }
+        // Get the current date
+        val currentDate = SimpleDateFormat("EEEE, d MMMM yyyy", locale).format(Date())
+
+        // Set the current date to the TextView
+        binding.textDate.text = currentDate
+    }
 
     private fun updateWeatherUI(weather: WeatherResponse) {
+
         binding.textCityName.text = weather.name
         binding.textWeatherCondition.text = weather.weather[0].description
+
+
         binding.textCurrentTemp.text = getString(R.string.temperature_format, weather.main.temp.toInt())
         binding.Windtext.text = getString(R.string.wind_speed_format, weather.wind.speed)
         binding.PressureValue.text = getString(R.string.pressure_format, weather.main.pressure)
         binding.humidityUnit.text = getString(R.string.humidity_format, weather.main.humidity)
+        displayCurrentDate()
 
         // Update the weather icon based on the weather condition code
         val iconResId = getWeatherIconResId(weather.weather[0].id)
@@ -221,6 +267,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         fusedLocationProviderClient.requestLocationUpdates(locationRequest, locationCallback, Looper.myLooper())
     }
 
+    private fun loadUserPreferences() {
+        // Retrieve the language preference
+        languageOption = sharedPreferences.getString("LANGUAGE", "en") ?: "en"
+    }
+
     private fun fetchWeatherData(cityName: String) {
         if(isWeatherFetched )
         {
@@ -228,9 +279,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
         else
         {
-            viewModel.fetchWeather(cityName, "metric")
-            viewModel.fetchDailyForecast(cityName, "metric")
-            viewModel.fetchThreeHourForecast(cityName, "metric")
+            viewModel.fetchWeather(cityName, "metric",languageOption)
+            viewModel.fetchDailyForecast(cityName, "metric",languageOption)
+            viewModel.fetchThreeHourForecast(cityName, "metric",languageOption)
         }
 
     }
