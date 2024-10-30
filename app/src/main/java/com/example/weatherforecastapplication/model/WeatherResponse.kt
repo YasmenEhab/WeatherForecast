@@ -60,7 +60,7 @@ data class ForecastResponse(
 // Forecast data class for each 3-hour interval
 data class Forecast(
     val dt: Long,
-    val main: MainForecast,
+    val main: Main,
     val weather: List<Weather>,
     val wind: Wind,
     val clouds: Clouds

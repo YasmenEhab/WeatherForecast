@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import kotlin.math.roundToInt
 
 class HomeViewModel(private val repo: WeatherRepository ,  private val sharedPreferences: SharedPreferences) : ViewModel() {
 
@@ -22,17 +23,17 @@ class HomeViewModel(private val repo: WeatherRepository ,  private val sharedPre
     val weatherIconResource: StateFlow<Int?> = _weatherIconResource
 
     // StateFlow for 3-hour forecast data
-    private val _threeHourForecast = MutableStateFlow<List<Forecast>?>(null)
-    val threeHourForecast: StateFlow<List<Forecast>?> = _threeHourForecast
+    private val _threeHourForecast = MutableStateFlow<ForecastState>(ForecastState.Loading)
+    val threeHourForecast: StateFlow<ForecastState> = _threeHourForecast
 
     // StateFlow for daily forecast data
-    private val _dailyForecast = MutableStateFlow<List<Forecast>?>(null)
-    val dailyForecast: StateFlow<List<Forecast>?> = _dailyForecast
+    private val _dailyForecast = MutableStateFlow<ForecastState>(ForecastState.Loading)
+    val dailyForecast: StateFlow<ForecastState> = _dailyForecast
 
     //private val apiKey = "7135fce85546c3c812b6e29c55b879cf"
     private val apiKey = "58016d418401e5a0e8e9baef8d569514"
 
-    private val city = "london"
+    //lateinit var  city
 
     init {
         loadPreferencesAndFetchWeather()
@@ -43,9 +44,9 @@ class HomeViewModel(private val repo: WeatherRepository ,  private val sharedPre
         val units = sharedPreferences.getString("TEMPERATURE_UNIT", "metric") ?: "metric"
         val lang = sharedPreferences.getString("LANGUAGE", "en") ?: "en"
 
-        fetchWeather(city, units, lang)
-        fetchThreeHourForecast(city, units, lang)
-        fetchDailyForecast(city, units, lang)
+//        fetchWeather(city, units, lang)
+//        fetchThreeHourForecast(city, units, lang)
+//        fetchDailyForecast(city, units, lang)
     }
 
     // Fetch current weather
@@ -69,16 +70,18 @@ class HomeViewModel(private val repo: WeatherRepository ,  private val sharedPre
 
     // Fetch 3-hour forecast data
     fun fetchThreeHourForecast(city: String, units: String, lang: String) {
+        _threeHourForecast.value=ForecastState.Loading
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Fetch 3-hour forecast from repository and collect the flow
-                repo.getThreeHourForecast(city, apiKey, units, lang).collect { forecastList ->
-                    Log.d("HomeViewModel", "3-hour forecast: $forecastList")
+                repo.getThreeHourForecast(city, apiKey, units, lang).collect { forecastResponse ->
+                    Log.d("HomeViewModel", "3-hour forecast: $forecastResponse")
                     // Emit the 3-hour forecast to the StateFlow
-                    _threeHourForecast.value = forecastList
+                    _threeHourForecast.value = ForecastState.Success(forecastResponse)
+
                 }
             } catch (e: Exception) {
-                // Handle exceptions
+                _threeHourForecast.value=ForecastState.Failure(e.message ?: "An unknown error occurred")
             }
         }
     }
@@ -88,13 +91,13 @@ class HomeViewModel(private val repo: WeatherRepository ,  private val sharedPre
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Fetch daily forecast from repository and collect the flow
-                repo.getDailyForecast(city, apiKey, units, lang).collect { dailyList ->
-                    Log.d("HomeViewModel", "Daily forecast: $dailyList")
+                repo.getDailyForecast(city, apiKey, units, lang).collect { forecastResponse ->
+                    Log.d("HomeViewModel", "Daily forecast: $forecastResponse")
                     // Emit the daily forecast to the StateFlow
-                    _dailyForecast.value = dailyList
+                    _dailyForecast.value = ForecastState.Success(forecastResponse)
                 }
             } catch (e: Exception) {
-                // Handle exceptions
+               _dailyForecast.value = ForecastState.Failure(e.message ?:"An unknown error occurred")
             }
         }
     }
@@ -111,4 +114,5 @@ class HomeViewModel(private val repo: WeatherRepository ,  private val sharedPre
         }
         _weatherIconResource.value = iconResId // Update the StateFlow with the new icon resource
     }
+
 }

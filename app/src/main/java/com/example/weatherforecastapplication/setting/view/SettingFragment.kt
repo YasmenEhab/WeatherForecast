@@ -39,8 +39,8 @@ class SettingFragment : Fragment() {
         sharedPreferences = requireContext().getSharedPreferences("Settings", Context.MODE_PRIVATE)
 
         setupLanguageSpinner()
-//        setupTemperatureUnitSpinner()
-//        setupWindSpeedUnitSpinner()
+        setupTemperatureUnitSpinner()
+
 //        setupLocationSpinner()
     }
 
@@ -54,24 +54,28 @@ class SettingFragment : Fragment() {
         binding.languageSpinner.adapter = languageAdapter
 
         // Load saved language and set selection
-        val savedLanguage = sharedPreferences.getString("LANGUAGE", "en")
+        var savedLanguage = sharedPreferences.getString("LANGUAGE", "en")
         Log.d(TAG, "Loaded saved language: $savedLanguage") // Log the saved language
 
         // Set selection based on saved language
         binding.languageSpinner.setSelection(if (savedLanguage == "ar") 1 else 0)
 
-        // Set up listener for when an item in the spinner is selected
-        binding.languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                // Determine the selected language based on position
-                val selectedLanguage = if (position == 0) "en" else "ar" // Correct mapping
-                Log.d(TAG, "Selected language: $selectedLanguage") // Log the selected language
 
-                // Save the selected language in SharedPreferences
-                sharedPreferences.edit().putString("LANGUAGE", selectedLanguage).apply()
-                Log.d(TAG, "Saved language: $selectedLanguage") // Log after saving
-                changeLanguage(selectedLanguage)
-            }
+            // Set up listener for when an item in the spinner is selected
+            binding.languageSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
+                    // Determine the selected language based on position
+                    val selectedLanguage = if (position == 0) "en" else "ar" // Correct mapping
+
+                    // Only save and change language if it's different from the current
+                    if (selectedLanguage != savedLanguage) {
+                        savedLanguage = selectedLanguage
+                        sharedPreferences.edit().putString("LANGUAGE", selectedLanguage).apply()
+                        Log.d(TAG, "Saved language: $selectedLanguage") // Log after saving
+                        changeLanguage(selectedLanguage)
+                    }
+                }
+
 
             override fun onNothingSelected(parent: AdapterView<*>) { }
         }
@@ -104,7 +108,7 @@ class SettingFragment : Fragment() {
         binding.tempUnitSpinner.setSelection(
             when (savedTempUnit) {
                 "imperial" -> 1
-                "kelvin" -> 2
+                "standard" -> 2
                 else -> 0 // metric
             }
         )
@@ -113,7 +117,7 @@ class SettingFragment : Fragment() {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedTempUnit = when (position) {
                     1 -> "imperial"
-                    2 -> "kelvin"
+                    2 -> "standard"
                     else -> "metric"
                 }
                 sharedPreferences.edit().putString("TEMPERATURE_UNIT", selectedTempUnit).apply()
@@ -122,28 +126,7 @@ class SettingFragment : Fragment() {
         }
     }
 
-    private fun setupWindSpeedUnitSpinner() {
-        val windSpeedUnitAdapter = ArrayAdapter.createFromResource(
-            requireContext(),
-            R.array.wind_speed_units_array,
-            R.layout.spinner_item
-        )
-        windSpeedUnitAdapter.setDropDownViewResource(R.layout.spinner_item)
-        binding.windSpeedUnitSpinner.adapter = windSpeedUnitAdapter
 
-        val savedWindSpeedUnit = sharedPreferences.getString("WIND_SPEED_UNIT", "meters/sec")
-        binding.windSpeedUnitSpinner.setSelection(
-            if (savedWindSpeedUnit == "miles/hour") 1 else 0
-        )
-
-        binding.windSpeedUnitSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-            override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
-                val selectedWindSpeedUnit = if (position == 1) "miles/hour" else "meters/sec"
-                sharedPreferences.edit().putString("WIND_SPEED_UNIT", selectedWindSpeedUnit).apply()
-            }
-            override fun onNothingSelected(parent: AdapterView<*>) { }
-        }
-    }
 
     private fun setupLocationSpinner() {
         val locationAdapter = ArrayAdapter.createFromResource(

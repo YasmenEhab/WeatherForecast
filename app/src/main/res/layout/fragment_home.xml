@@ -7,7 +7,31 @@
     android:background="@color/back_1"
     android:orientation="vertical"
     tools:context=".home.view.HomeFragment">
+    <!-- Error Layout for displaying errors and retry option -->
+    <LinearLayout
+        android:id="@+id/errorLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:visibility="gone">
 
+        <TextView
+            android:id="@+id/textError"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Error occurred while fetching data"
+            android:textColor="@android:color/holo_red_dark"
+            android:textSize="16sp"
+            android:padding="8dp"
+            android:layout_marginBottom="8dp" />
+
+        <Button
+            android:id="@+id/buttonRetry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Retry" />
+    </LinearLayout>
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -19,8 +43,6 @@
             android:visibility="gone">
 
             <!-- ProgressBar -->
-
-            <!-- Error Text -->
             <ProgressBar
                 android:id="@+id/progressBar"
                 style="?android:attr/progressBarStyle"
@@ -28,13 +50,7 @@
                 android:layout_height="match_parent"
                 android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/textError"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerHorizontal="true"
-                android:textColor="@android:color/holo_red_dark"
-                android:visibility="gone" />
+
 
             <!-- City Name -->
             <TextView
@@ -44,7 +60,7 @@
                 android:layout_centerHorizontal="true"
                 android:layout_marginTop="40dp"
                 android:gravity="center"
-                android:text="city for design"
+                android:text="@string/loading"
                 android:textColor="@android:color/white"
                 android:textSize="24sp"
                 android:textStyle="bold" />
@@ -58,7 +74,7 @@
                 android:layout_centerHorizontal="true"
                 android:gravity="center"
                 android:paddingTop="4dp"
-                android:text="Monday, October 23"
+                android:text="@string/loading"
                 android:textColor="@android:color/white"
                 android:textSize="16sp" />
 
@@ -88,7 +104,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:paddingTop="8dp"
-                    android:text="Clear Sky"
+                    android:text="@string/loading"
                     android:textColor="@android:color/white"
                     android:textSize="18sp" />
 
@@ -98,7 +114,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:paddingTop="16dp"
-                    android:text="20°C"
+                    android:text="@string/loading"
                     android:textColor="@android:color/white"
                     android:textSize="72sp"
                     android:textStyle="bold" />

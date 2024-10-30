@@ -56,7 +56,7 @@
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/temp_unit"
+        android:text="@string/Units"
         android:textSize="16sp"
         android:textColor="@android:color/white"
         android:layout_marginTop="16dp" />
@@ -86,21 +86,6 @@
         android:popupBackground="@android:color/darker_gray"
         android:layout_marginBottom="8dp" />
 
-    <!-- Wind Speed Unit Setting -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/wind_speed_unit"
-        android:textSize="16sp"
-        android:textColor="@android:color/white"
-        android:layout_marginTop="16dp" />
 
-    <Spinner
-        android:id="@+id/windSpeedUnitSpinner"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:entries="@array/wind_speed_units_array"
-        android:popupBackground="@android:color/darker_gray"
-        android:layout_marginBottom="16dp" />
 
 </LinearLayout>

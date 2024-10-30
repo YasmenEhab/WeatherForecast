@@ -1,5 +1,6 @@
 package com.example.weatherforecastapplication.home.view
 
+import android.content.Context
 import androidx.recyclerview.widget.DiffUtil
 import com.example.weatherforecastapplication.model.Forecast
 import android.view.LayoutInflater
@@ -9,6 +10,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.weatherforecastapplication.R
 import com.example.weatherforecastapplication.databinding.ItemDailyForecastBinding
+import java.text.NumberFormat
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -47,6 +49,10 @@ class DailyForecastAdapter(private val languageOption: String) : ListAdapter<For
         val formattedDay = dayFormat.format(date)
         holder.binding.textDay.text = formattedDay
 
+        // Set the Locale based on the language option
+        val locale = if (languageOption == "ar") Locale("ar", "SA") else Locale.getDefault()
+
+
         // Set "Today" for the first item, otherwise use the actual day name
         val displayDay = if (position == 0) {
             // Check the language option
@@ -61,9 +67,29 @@ class DailyForecastAdapter(private val languageOption: String) : ListAdapter<For
 
         holder.binding.textDay.text = displayDay
 
-        // Set the high and low temperatures
-        holder.binding.textTemp.text = holder.binding.root.context.getString(R.string.temperature_format, forecast.main.temp.toInt())
+        // Get temperature unit from SharedPreferences
+        val temperatureOption = holder.binding.root.context.getSharedPreferences("Settings", Context.MODE_PRIVATE)
+            .getString("TEMPERATURE_UNIT", "metric") ?: "metric"
 
+        // Format the temperature value with Arabic numerals if language is set to Arabic
+        val temperatureFormat = NumberFormat.getInstance(locale)
+        val temperature = when (temperatureOption) {
+            "metric" -> {
+                if (languageOption == "ar") "${temperatureFormat.format(forecast.main.temp.toInt())}°س" // Arabic Celsius
+                else "${forecast.main.temp.toInt()}°C" // English Celsius
+            }
+
+            "imperial" -> {
+                if (languageOption == "ar") "${temperatureFormat.format(forecast.main.temp.toInt())}°ف" // Arabic Fahrenheit
+                else "${forecast.main.temp.toInt()}°F" // English Fahrenheit
+            }
+            else -> {
+                if (languageOption == "ar") "${temperatureFormat.format(forecast.main.temp.toInt())} ك" // Arabic Kelvin
+                else "${forecast.main.temp.toInt()} K" // English Kelvin
+            }
+        }
+
+        holder.binding.textTemp.text = temperature
 
         // Load the weather icon (if applicable)
 //        Glide.with(holder.binding.imageDailyWeatherIcon.context)

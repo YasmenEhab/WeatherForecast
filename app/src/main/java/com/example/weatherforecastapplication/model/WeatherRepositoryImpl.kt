@@ -32,20 +32,32 @@ class WeatherRepositoryImpl private constructor(
     }
 
     // Get 3-hour interval temperatures and process them
-    override suspend fun getThreeHourForecast(city: String, apiKey: String, units: String, lang: String): Flow<List<Forecast>> {
-        return remoteDataSource.getWeatherForecastOverNetwork(city, apiKey, units , lang).map { forecastResponse ->
-            // Extract and return the list of 3-hour forecast
-            forecastResponse.list
+    override suspend fun getThreeHourForecast(city: String, apiKey: String, units: String, lang: String): Flow<ForecastResponse> {
+        return remoteDataSource.getWeatherForecastOverNetwork(city, apiKey, units, lang).map { forecastResponse ->
+            // Take the next 8 forecasts in 3-hour intervals
+            val nextEightForecasts = forecastResponse.list.take(8) // Adjust to ensure we get the first 8 items
+
+            // Create a new ForecastResponse with these 8 forecasts
+            ForecastResponse(
+                list = nextEightForecasts,
+                city = forecastResponse.city // Retaining the city information
+            )
         }
     }
 
     // Get daily temperatures by grouping forecast into days
-    override suspend fun getDailyForecast(city: String, apiKey: String, units: String, lang: String): Flow<List<Forecast>> {
+    override suspend fun getDailyForecast(city: String, apiKey: String, units: String, lang: String): Flow<ForecastResponse> {
         return remoteDataSource.getWeatherForecastOverNetwork(city, apiKey, units, lang).map { forecastResponse ->
-            // Group by day and calculate daily temperatures
-            forecastResponse.list.groupBy { it.dt / 86400 } // Group by day (86400 seconds = 1 day)
-                .map { entry -> entry.value.first() } // For simplicity, taking the first forecast of each day
-        }
+            // Group by day (86400 seconds = 1 day)
+            val groupedForecasts = forecastResponse.list.groupBy { it.dt / 86400 }
+            // Take the first forecast for each of the first 5 unique days
+            val dailyForecasts = groupedForecasts.entries.take(5).flatMap { entry -> entry.value.take(1) } // Adjusted to ensure only one entry per day
+            // Create a new ForecastResponse with the daily forecasts
+            ForecastResponse(
+                list = dailyForecasts,
+                city = forecastResponse.city // Retaining the city information
+            )}
+
     }
 
 }

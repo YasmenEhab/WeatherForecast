@@ -10,9 +10,9 @@
     <string name="pressure">الضغط</string>
     <string name="humidity">الرطوبة</string>
     <string name="weather_condition_format">الحالة: %1$s</string>
-    <string name="temperature_format">%1$d °س</string> <!-- Integer -->
-    <string name="wind_speed_format">%1$.1f كم/ساعة</string> <!-- Float -->
-    <string name="pressure_format">%1$d هكتوباسكال</string> <!-- Integer -->
+    <string name="temperature_format">%1$d %2$s</string>
+    <string name="wind_speed_format">%1$.1f %2$s</string>
+    <string name="pressure_format">%1$d باسكال</string> <!-- Integer -->
     <string name="humidity_format">%1$d %%</string>
     <string name="find_a_city">ابحث عن مدينة</string>
     <string name="pick_location">اختر موقعًا</string>
@@ -21,6 +21,7 @@
     <string name="temp_unit">وحدة الحرارة</string>
     <string name="location">الموقع</string>
     <string name="wind_speed_unit">وحدة سرعة الرياح</string>
+    <string name="Units">الوحدات</string> <!-- Integer -->
 
     <string-array name="languages_array">
         <item>الإنجليزية</item>
@@ -28,9 +29,9 @@
     </string-array>
 
     <string-array name="temp_units_array">
-        <item>درجة مئوية</item>
-        <item>كلفن</item>
-        <item>فهرنهايت</item>
+        <item>متري</item>
+        <item>قياسي</item>
+        <item>إمبراطوري</item>
     </string-array>
 
     <string-array name="location_options_array">
