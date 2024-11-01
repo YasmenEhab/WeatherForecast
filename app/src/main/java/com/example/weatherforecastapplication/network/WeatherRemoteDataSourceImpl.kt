@@ -39,6 +39,8 @@ class WeatherRemoteDataSourceImpl(private val apiService: WeatherService) : Weat
         }
     }
 
+
+
     companion object {
         @Volatile
         private var INSTANCE: WeatherRemoteDataSourceImpl? = null

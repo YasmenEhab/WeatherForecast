@@ -40,7 +40,8 @@
             android:id="@+id/mainContentLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone">
+
+            >
 
             <!-- ProgressBar -->
             <ProgressBar
@@ -279,6 +280,32 @@
                 android:layout_marginTop="16dp"
                 android:background="@drawable/background_2"
                 tools:listitem="@layout/item_daily_forecast" />
+            <ImageView
+                android:id="@+id/favouriteCityimg"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignBottom="@+id/text_city_name"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="0dp"
+
+                android:layout_marginEnd="120dp"
+                android:layout_marginBottom="5dp"
+                android:layout_toEndOf="@+id/text_city_name"
+                app:srcCompat="@drawable/baseline_favorite2_24"
+                 />
+            <ImageView
+                android:id="@+id/locationimg"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignBottom="@+id/text_city_name"
+                android:layout_alignParentEnd="true"
+                android:layout_marginStart="0dp"
+
+                android:layout_marginEnd="59dp"
+                android:layout_marginBottom="5dp"
+                android:layout_toEndOf="@+id/text_city_name"
+                app:srcCompat="@drawable/baseline_location_pin_24"
+                tools:srcCompat="@drawable/baseline_location_pin_24" />
 
         </RelativeLayout>
     </ScrollView>

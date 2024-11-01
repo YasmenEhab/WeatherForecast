@@ -1,6 +1,10 @@
 package com.example.weatherforecastapplication.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+
 // Main weather response data class
+
 data class WeatherResponse(
     val coord: Coord,
     val weather: List<Weather>,
@@ -77,4 +81,14 @@ data class MainForecast(
 data class City(
     val name: String,
     val country: String
+)
+
+@Entity(tableName = "favorite_city_table")
+data class FavoriteCity(
+    @PrimaryKey(autoGenerate = true)
+    val id: Int = 0,
+    val cityName: String,
+    val country: String="",
+    val latitude: Double=0.0,
+    val longitude: Double=0.0
 )

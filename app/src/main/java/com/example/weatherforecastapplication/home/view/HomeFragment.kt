@@ -14,33 +14,46 @@ import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
-import androidx.core.app.ActivityCompat
+import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+
 import com.example.weatherforecastapplication.R
 import com.example.weatherforecastapplication.databinding.FragmentHomeBinding
+import com.example.weatherforecastapplication.db.AppDatabase
+import com.example.weatherforecastapplication.db.FavoriteCityLocalDataSourceImpl
 import com.example.weatherforecastapplication.home.viewmodel.ApiState
 import com.example.weatherforecastapplication.home.viewmodel.ForecastState
 import com.example.weatherforecastapplication.home.viewmodel.HomeViewModel
 import com.example.weatherforecastapplication.home.viewmodel.HomeViewModelFactory
-import com.example.weatherforecastapplication.model.Forecast
+import com.example.weatherforecastapplication.map.MapFragment
+import com.example.weatherforecastapplication.model.FavoriteCity
 import com.example.weatherforecastapplication.model.WeatherRepositoryImpl
 import com.example.weatherforecastapplication.model.WeatherResponse
 import com.example.weatherforecastapplication.network.RetrofitHelper
 import com.example.weatherforecastapplication.network.WeatherRemoteDataSourceImpl
 import com.example.weatherforecastapplication.network.WeatherService
+import com.example.weatherforecastapplication.map.SharedViewModel
 import com.google.android.gms.location.*
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
+import androidx.lifecycle.Observer
+
 
 import java.util.Locale
-import kotlin.math.roundToInt
 
 class HomeFragment : Fragment(R.layout.fragment_home) {
+
+    private val sharedViewModel: SharedViewModel by activityViewModels()
+
 
     //location
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
@@ -65,8 +78,27 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private lateinit var sharedPreferences: SharedPreferences
     private var languageOption: String = "en"
     private var unitOption: String = "metric"
+    private var locationOption: String = "gps"
+    var locationFlag = false
 
 
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
+        val view = inflater.inflate(R.layout.fragment_home, container, false)
+
+        // Observe the selected city using the correct Observer
+        sharedViewModel.selectedCity.observe(viewLifecycleOwner, Observer { cityName ->
+            // Update UI with the selected city
+            // For example, you can display the city name in a TextView
+            Log.d("HomeFragment", "Received selected city: $cityName") // Log the received city
+            binding.textCityName.text = cityName // Update your TextView here
+            fetchWeatherData(cityName)
+            locationFlag = true
+
+
+        })
+
+        return view
+    }
 
     override fun onViewCreated(view: android.view.View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -77,17 +109,24 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         // Initialize UI visibility
         initUI()
 
+        // Obtain an instance of FavoriteCityDao
+        val favoriteCityDao = AppDatabase.getDatabase(requireContext()).favoriteCityDao()
+
+        // Create an instance of the local data source
+        val favoriteCityLocalDataSource = FavoriteCityLocalDataSourceImpl(favoriteCityDao)
+
         // Initialize the repository
         val weatherRepository = WeatherRepositoryImpl.getInstance(
             WeatherRemoteDataSourceImpl.getInstance(
                 RetrofitHelper.getInstance().create(WeatherService::class.java)
-            )
+            ),localDataSource = favoriteCityLocalDataSource
         )
 
 
         // Initialize SharedPreferences
         sharedPreferences = requireContext().getSharedPreferences("Settings", Context.MODE_PRIVATE)
         loadUserPreferences()
+        Log.d("HomeFragment", "Saved location option: $locationOption")
 
 
         // Set the locale based on saved preference
@@ -103,9 +142,59 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         initHourlyRecyclerView()
         initDailyRecyclerView()
 
-
-
         geocoder = Geocoder(requireContext(), if (languageOption == "ar") Locale("ar") else Locale("en"))
+
+        binding.favouriteCityimg.setOnClickListener {
+            // Save the current city to the favorites if the city name is not null
+            currentCityName?.let { cityName ->
+                val favoriteCity = FavoriteCity(cityName = cityName)
+                lifecycleScope.launch {
+                    try {
+                        favoriteCityLocalDataSource.saveFavoriteCity(favoriteCity)
+                        Log.d("HomeFragment", "City $cityName added to favorites.")
+                        // Optional: Provide user feedback (e.g., a Toast message)
+                        Toast.makeText(context, "$cityName added to favorites!", Toast.LENGTH_SHORT)
+                            .show()
+                    } catch (e: Exception) {
+                        // Log the error
+                        Log.e("HomeFragment", "Error adding city to favorites: ${e.message}")
+                        // Optional: Inform the user of the error
+                        Toast.makeText(
+                            context,
+                            "Failed to add $cityName to favorites.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                } ?: Log.d("HomeFragment", "City name is null, cannot add to favorites.")
+
+            }
+        }
+
+        //on map clicked listener
+        binding.locationimg.setOnClickListener {
+            Log.d("HomeFragment", "Navigating to MapFragment") // Log the navigation
+
+            locationFlag =true
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.nav_host_fragment, MapFragment())
+                .addToBackStack(null) // Add to back stack to allow navigation back
+                .commit()
+        }
+
+        // Check location option and retrieve location based on preference
+
+            if (checkPermissions()) {
+                if (isLocationEnabled()) {
+                    Log.d("HomeFragment", "getFreshLocation ")
+                    getFreshLocation()
+                } else {
+                    enableLocationServices()
+                }
+            } else {
+                requestLocationPermission()
+            }
+
+
 
         // Observe weather data
         lifecycleScope.launchWhenStarted {
@@ -181,16 +270,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             }
         }
 
-        // Check and request location permissions
-        if (checkPermissions()) {
-            if (isLocationEnabled()) {
-                getFreshLocation()
-            } else {
-                enableLocationServices()
-            }
-        } else {
-            requestLocationPermission()
-        }
+
     }
 
     private fun setLocale() {
@@ -252,42 +332,37 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         return windUnit to temperatureUnit
 
     }
+
     private fun loadUserPreferences() {
         // Retrieve the language preference
         languageOption = sharedPreferences.getString("LANGUAGE", "en") ?: "en"
         unitOption = sharedPreferences.getString("TEMPERATURE_UNIT", "metric") ?: "metric"
+        locationOption = sharedPreferences.getString("LOCATION_OPTION","gps") ?: "gps"
 
     }
-    private fun fetchWeatherData(cityName: String) {
-        if (!isWeatherFetched) {
+
+     fun fetchWeatherData(cityName: String) {
+        //if (!isWeatherFetched) {
             Log.d("HomeFragment", "Fetching weather with city: $cityName, unit: $unitOption, language: $languageOption")
 
             viewModel.fetchWeather(cityName, unitOption, languageOption)
             viewModel.fetchDailyForecast(cityName, unitOption, languageOption)
             viewModel.fetchThreeHourForecast(cityName, unitOption, languageOption)
-        }
+        //}
 
     }
     private fun updateWeatherUI(weather: WeatherResponse) {
-
-
         binding.textCityName.text = weather.name
         binding.textWeatherCondition.text = weather.weather[0].description
-
-        // Determine the temperature unit
         val (windUnit, temperatureUnit) = getUnits()
         binding.textCurrentTemp.text = getString(R.string.temperature_format, weather.main.temp.toInt(), temperatureUnit)
         binding.Windtext.text = getString(R.string.wind_speed_format, weather.wind.speed, windUnit)
-
         binding.PressureValue.text = getString(R.string.pressure_format, weather.main.pressure)
         binding.humidityUnit.text = getString(R.string.humidity_format, weather.main.humidity)
         displayCurrentDate()
-
-        // Update the weather icon based on the weather condition code
         val iconResId = getWeatherIconResId(weather.weather[0].id)
         binding.imageWeatherCondition.setImageResource(iconResId)
     }
-
 
     private fun getWeatherIconResId(conditionId: Int): Int {
         return when (conditionId) {
@@ -330,9 +405,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
     @SuppressLint("MissingPermission")
     private fun getFreshLocation() {
+
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireContext())
-// Set Geocoder locale based on language option
+        // Set Geocoder locale based on language option
         val geocoderLocale = if (languageOption == "ar") Locale("ar") else Locale.getDefault()
         geocoder = Geocoder(requireContext(), geocoderLocale)  // Set the locale for Geocoder
 
@@ -351,9 +427,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
                         ?.get(0)?.locality ?: "Unknown Location"
                     if (newCityName != currentCityName) {
                         currentCityName = newCityName
-                        fetchWeatherData(newCityName)
-                        Log.d("HomeFragment", "City changed, fetching new weather data for $newCityName")
-                    }}
+                        if(!locationFlag){
+                            if (newCityName != null) {
+                                fetchWeatherData(newCityName)
+                            } else {
+                                showError("Unable to retrieve city name from location.")
+                            }
+                            Log.d("HomeFragment", "City changed, fetching new weather data for $newCityName")
+
+                        }
+                         }}
             }
         }
 
@@ -364,16 +447,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         )
     }
 
-
-
-
-
-
     private fun enableLocationServices() {
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         startActivity(intent)
     }
-
+//    private fun openMapForLocation() {
+//        val intent = Intent(requireContext(), MapActivity::class.java)
+//        startActivityForResult(intent, REQUEST_LOCATION_CODE)
+//    }
     private fun initUI() {
         // Initially hide main content until data is loaded
         binding.mainContentLayout.visibility = View.GONE
@@ -383,6 +464,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
     private fun showMainContent(isVisible: Boolean) {
         binding.mainContentLayout.visibility = if (isVisible) View.VISIBLE else View.GONE
     }
+
 
     private fun showLoading(isLoading: Boolean) {
         binding.progressBar.visibility = if (isLoading) View.VISIBLE else View.GONE
@@ -418,4 +500,11 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             requestLocationPermission()
         }
     }
+    override fun onDestroy() {
+        super.onDestroy()
+        // Clean up location updates
+        fusedLocationProviderClient.removeLocationUpdates(locationCallback)
+    }
+
+
 }

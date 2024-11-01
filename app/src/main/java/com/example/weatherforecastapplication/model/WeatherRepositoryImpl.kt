@@ -1,24 +1,28 @@
 package com.example.weatherforecastapplication.model
 
 
+import com.example.weatherforecastapplication.db.FavoriteCityLocalDataSource
 import com.example.weatherforecastapplication.network.WeatherRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 
 class WeatherRepositoryImpl private constructor(
-    private val remoteDataSource: WeatherRemoteDataSource
+    private val remoteDataSource: WeatherRemoteDataSource,
+    private val localDataSource: FavoriteCityLocalDataSource
 ) : WeatherRepository {
 
     companion object {
         @Volatile
         private var INSTANCE: WeatherRepositoryImpl? = null
         fun getInstance(
-            remoteDataSource: WeatherRemoteDataSource
+            remoteDataSource: WeatherRemoteDataSource,
+            localDataSource: FavoriteCityLocalDataSource
         ): WeatherRepositoryImpl {
             return INSTANCE ?: synchronized(this) {
                 INSTANCE ?: WeatherRepositoryImpl(
-                    remoteDataSource
+                    remoteDataSource,
+                    localDataSource
                 ).also { INSTANCE = it }
             }
 
@@ -58,6 +62,21 @@ class WeatherRepositoryImpl private constructor(
                 city = forecastResponse.city // Retaining the city information
             )}
 
+    }
+
+    // Save a city as a favorite
+    override suspend fun saveFavoriteCity(city: FavoriteCity) {
+        localDataSource.saveFavoriteCity(city)
+    }
+
+    // Retrieve all favorite cities
+    suspend fun getFavoriteCities(): Flow<List<FavoriteCity>> {
+        return localDataSource.getFavoriteCities()
+    }
+
+    // Delete a specific favorite city by its ID
+    override suspend fun deleteFavoriteCity(cityId: Int) {
+        localDataSource.deleteFavoriteCity(cityId)
     }
 
 }

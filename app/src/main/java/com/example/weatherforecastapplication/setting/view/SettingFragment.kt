@@ -1,6 +1,7 @@
 package com.example.weatherforecastapplication.setting.view
 
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
@@ -41,7 +42,7 @@ class SettingFragment : Fragment() {
         setupLanguageSpinner()
         setupTemperatureUnitSpinner()
 
-//        setupLocationSpinner()
+       setupLocationSpinner()
     }
 
     private fun setupLanguageSpinner() {
@@ -145,7 +146,14 @@ class SettingFragment : Fragment() {
         binding.locationSpinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>, view: View?, position: Int, id: Long) {
                 val selectedLocationOption = if (position == 1) "map" else "gps"
+                 val REQUEST_LOCATION_CODE = 5005
                 sharedPreferences.edit().putString("LOCATION_OPTION", selectedLocationOption).apply()
+                Log.d(TAG, "Selected location option: $selectedLocationOption") // Log the selected option
+//                if (selectedLocationOption == "map") {
+//                    // Start the MapActivity
+//                    val intent = Intent(requireContext(), MapActivity::class.java)
+//                    startActivityForResult(intent, REQUEST_LOCATION_CODE)
+//                }
             }
             override fun onNothingSelected(parent: AdapterView<*>) { }
         }
