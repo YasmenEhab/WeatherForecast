@@ -66,11 +66,12 @@ class WeatherRepositoryImpl private constructor(
 
     // Save a city as a favorite
     override suspend fun saveFavoriteCity(city: FavoriteCity) {
+
         localDataSource.saveFavoriteCity(city)
     }
 
     // Retrieve all favorite cities
-    suspend fun getFavoriteCities(): Flow<List<FavoriteCity>> {
+    override suspend fun getFavoriteCities(): Flow<List<FavoriteCity>> {
         return localDataSource.getFavoriteCities()
     }
 

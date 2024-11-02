@@ -8,10 +8,21 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.example.weatherforecastapplication.R
+import com.example.weatherforecastapplication.db.AppDatabase
+import com.example.weatherforecastapplication.db.FavoriteCityLocalDataSourceImpl
 import com.example.weatherforecastapplication.home.view.HomeFragment
+import com.example.weatherforecastapplication.model.FavoriteCity
+import com.example.weatherforecastapplication.model.WeatherRepository
+import com.example.weatherforecastapplication.model.WeatherRepositoryImpl
+import com.example.weatherforecastapplication.network.RetrofitHelper
+import com.example.weatherforecastapplication.network.WeatherRemoteDataSourceImpl
+import com.example.weatherforecastapplication.network.WeatherService
+import kotlinx.coroutines.launch
 import org.osmdroid.api.IMapController
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
@@ -27,12 +38,7 @@ import java.util.Locale
 class MapFragment : Fragment() {
     private lateinit var osmMapView: MapView
     private val TAG = "MapFragment"
-//    private lateinit var citySelectedListener: CitySelectedListener
-//
-//
-//    interface CitySelectedListener {
-//        fun onCitySelected(cityName: String)
-//    }
+
 private val sharedViewModel: SharedViewModel by activityViewModels()
 
     override fun onCreateView(
@@ -135,6 +141,31 @@ private val sharedViewModel: SharedViewModel by activityViewModels()
     private fun addToFavorites(cityName: String, geoPoint: GeoPoint) {
         Log.d(TAG, "Added to favorites: $cityName at Latitude = ${geoPoint.latitude}, Longitude = ${geoPoint.longitude}")
         // Save to favorites in your app's data store (e.g., Shared Preferences, database)
+        // Obtain an instance of FavoriteCityDao
+        val favoriteCityDao = AppDatabase.getDatabase(requireContext()).favoriteCityDao()
+
+        // Create an instance of the local data source
+        val favoriteCityLocalDataSource = FavoriteCityLocalDataSourceImpl(favoriteCityDao)
+
+        // Initialize the repository
+        val weatherRepository = WeatherRepositoryImpl.getInstance(
+            WeatherRemoteDataSourceImpl.getInstance(
+                RetrofitHelper.getInstance().create(WeatherService::class.java)
+            ),localDataSource = favoriteCityLocalDataSource
+        )
+
+        // Launch a coroutine to save the favorite city
+        lifecycleScope.launch {
+            try {
+                val favoriteCity = FavoriteCity(cityName = cityName)
+                weatherRepository.saveFavoriteCity(favoriteCity)
+                Toast.makeText(context, "$cityName added to favorites!", Toast.LENGTH_SHORT).show()
+                Log.d(TAG, "City $cityName successfully added to favorites in the database.")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error adding city to favorites: ${e.message}")
+                Toast.makeText(context, "Failed to add $cityName to favorites.", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
 

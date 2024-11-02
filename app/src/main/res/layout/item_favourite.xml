@@ -1,6 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/background_2"
+    android:id="@+id/favlayout"
+    android:padding="8dp">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <!-- TextView for the city name on the left -->
+    <TextView
+        android:id="@+id/text_city_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="City Name"
+        android:textSize="20sp"
+        android:textColor="@android:color/white"
+        />
+
+    <!-- ImageView for the icon on the right -->
+    <ImageView
+        android:id="@+id/icon_favorite"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:src="@drawable/baseline_delete_24" />
+</LinearLayout>

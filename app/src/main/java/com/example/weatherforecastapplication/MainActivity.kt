@@ -1,5 +1,6 @@
 package com.example.weatherforecastapplication
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -10,8 +11,10 @@ import com.example.weatherforecastapplication.fav.view.FavFragment
 import com.example.weatherforecastapplication.home.view.HomeFragment
 import com.example.weatherforecastapplication.map.SharedViewModel
 import com.example.weatherforecastapplication.setting.view.SettingFragment
-
-class MainActivity : AppCompatActivity() {
+interface FragmentNavigation {
+    fun navigateToHome(cityName: String)
+}
+class MainActivity : AppCompatActivity(), FragmentNavigation {
 
     private lateinit var binding: ActivityMainBinding
     private val sharedViewModel: SharedViewModel by viewModels()
@@ -42,6 +45,15 @@ class MainActivity : AppCompatActivity() {
         val fragmentTransaction = fragmentManager.beginTransaction()
         fragmentTransaction.replace(R.id.nav_host_fragment, fragment) // Ensure this ID is correct
         fragmentTransaction.commit()
+    }
+
+    override fun navigateToHome(cityName: String) {
+        val homeFragment = HomeFragment().apply {
+            arguments = Bundle().apply {
+                putString("city_name", cityName) // Pass the city name as an argument
+            }
+        }
+        replaceFragment(homeFragment) // Replace with HomeFragment
     }
 
 

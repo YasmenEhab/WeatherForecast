@@ -8,5 +8,6 @@ interface WeatherRepository {
     suspend fun getDailyForecast(city: String, apiKey: String, units: String, lang: String): Flow<ForecastResponse>
     suspend fun saveFavoriteCity(city: FavoriteCity)
     suspend fun deleteFavoriteCity(cityId: Int)
+    suspend fun getFavoriteCities(): Flow<List<FavoriteCity>>
 
 }
