@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.map
 
 
 class WeatherRepositoryImpl private constructor(
-    private val remoteDataSource: WeatherRemoteDataSource,
+     val remoteDataSource: WeatherRemoteDataSource,
     private val localDataSource: FavoriteCityLocalDataSource
 ) : WeatherRepository {
 

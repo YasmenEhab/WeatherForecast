@@ -4,6 +4,8 @@
     <string name="city_name">اسم المدينة</string>
     <string name="hello_blank_fragment">مرحبًا بك في الصفحة الفارغة</string>
     <string name="home">الرئيسية</string>
+    <string name="Setting">عداداتالا</string>
+
     <string name="favorites">المفضلة</string>
     <string name="alarm">المنبه</string>
     <string name="wind">الرياح</string>
@@ -21,7 +23,11 @@
     <string name="temp_unit">وحدة الحرارة</string>
     <string name="location">الموقع</string>
     <string name="wind_speed_unit">وحدة سرعة الرياح</string>
-    <string name="Units">الوحدات</string> <!-- Integer -->
+    <string name="Units">الوحدات</string>
+    <string name="add_weather_alert">Add Weather Alert</string>
+    <string name="alarm_time">Alarm Time</string>
+    <string name="alarm_name">Alarm Name</string>
+    <string name="delete_alarm">delete alarm</string> <!-- Integer -->
 
     <string-array name="languages_array">
         <item>الإنجليزية</item>

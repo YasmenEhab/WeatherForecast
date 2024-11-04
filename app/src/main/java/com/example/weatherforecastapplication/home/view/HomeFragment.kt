@@ -144,31 +144,6 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 
         geocoder = Geocoder(requireContext(), if (languageOption == "ar") Locale("ar") else Locale("en"))
 
-//        binding.favouriteCityimg.setOnClickListener {
-//            // Save the current city to the favorites if the city name is not null
-//            currentCityName?.let { cityName ->
-//                val favoriteCity = FavoriteCity(cityName = cityName)
-//                lifecycleScope.launch {
-//                    try {
-//                        favoriteCityLocalDataSource.saveFavoriteCity(favoriteCity)
-//                        Log.d("HomeFragment", "City $cityName added to favorites.")
-//                        // Optional: Provide user feedback (e.g., a Toast message)
-//                        Toast.makeText(context, "$cityName added to favorites!", Toast.LENGTH_SHORT)
-//                            .show()
-//                    } catch (e: Exception) {
-//                        // Log the error
-//                        Log.e("HomeFragment", "Error adding city to favorites: ${e.message}")
-//                        // Optional: Inform the user of the error
-//                        Toast.makeText(
-//                            context,
-//                            "Failed to add $cityName to favorites.",
-//                            Toast.LENGTH_SHORT
-//                        ).show()
-//                    }
-//                } ?: Log.d("HomeFragment", "City name is null, cannot add to favorites.")
-//
-//            }
-//        }
 
         //on map clicked listener
         binding.locationimg.setOnClickListener {

@@ -24,7 +24,11 @@
     <string name="location">location</string>
     <string name="wind_speed_unit">wind_speed_unit</string>
     <string name="loading">loading...</string>
-    <string name="Units">Units</string> <!-- Integer -->
+    <string name="Units">Units</string>
+    <string name="add_weather_alert">Add Weather Alert</string>
+    <string name="alarm_time">Alarm Time</string>
+    <string name="alarm_name">Alarm Name</string>
+    <string name="delete_alarm">delete alarm</string> <!-- Integer -->
     <string-array name="languages_array">
         <item>English</item>
         <item>Arabic</item>
