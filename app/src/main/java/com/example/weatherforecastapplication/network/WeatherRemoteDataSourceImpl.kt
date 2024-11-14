@@ -23,12 +23,40 @@ class WeatherRemoteDataSourceImpl(private val apiService: WeatherService) : Weat
             }
         }
     }
+    override suspend fun getWeatherInfoOverNetwork2(lat: Double,long: Double, apiKey: String, units: String , lang: String): Flow<WeatherResponse> {
+        return flow {
+            try {
+                // Make the API call to get the weather information
+                val response = apiService.getCurrentWeather2(lat,long, apiKey, units, lang)
+
+                // Emit the result to the flow
+                emit(response)
+            } catch (e: Exception) {
+                // Handle any exceptions (e.g., network issues) and emit an empty object or handle errors accordingly
+                throw e // You can also handle it with custom error handling
+            }
+        }
+    }
     /* Fetch weather forecast for the next 5 days and emit as Flow */
     override suspend fun getWeatherForecastOverNetwork(city: String, apiKey: String, units: String, lang: String): Flow<ForecastResponse> {
         return flow {
             try {
                 // Make the API call to get the weather forecast
                 val response = apiService.getWeatherForecast(city, apiKey, units, lang)
+
+                // Emit the result to the flow
+                emit(response)
+            } catch (e: Exception) {
+                // Handle any exceptions (e.g., network issues)
+                throw e // Custom error handling can be implemented here
+            }
+        }
+    }
+    override suspend fun getWeatherForecastOverNetwork2(lat:Double,long :Double, apiKey: String, units: String, lang: String): Flow<ForecastResponse> {
+        return flow {
+            try {
+                // Make the API call to get the weather forecast
+                val response = apiService.getWeatherForecast2(lat,long, apiKey, units, lang)
 
                 // Emit the result to the flow
                 emit(response)

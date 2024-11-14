@@ -10,15 +10,15 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import android.Manifest.permission.POST_NOTIFICATIONS
+import com.example.skycast.alert.view.AlarmFragment
 
-import com.example.weatherforecastapplication.alarm.view.AlarmFragment
 import com.example.weatherforecastapplication.databinding.ActivityMainBinding
 import com.example.weatherforecastapplication.fav.view.FavFragment
 import com.example.weatherforecastapplication.home.view.HomeFragment
 import com.example.weatherforecastapplication.map.SharedViewModel
 import com.example.weatherforecastapplication.setting.view.SettingFragment
 interface FragmentNavigation {
-    fun navigateToHome(cityName: String)
+    fun navigateToHome(latitude : Double , longitude : Double )
 }
 class MainActivity : AppCompatActivity(), FragmentNavigation {
     private val POST_NOTIFICATIONS_REQUEST_CODE = 1001
@@ -56,15 +56,16 @@ class MainActivity : AppCompatActivity(), FragmentNavigation {
         fragmentTransaction.commit()
     }
 
-    override fun navigateToHome(cityName: String) {
+    override fun navigateToHome(latitude: Double, longitude: Double) {
         val homeFragment = HomeFragment().apply {
             arguments = Bundle().apply {
-                putString("city_name", cityName) // Pass the city name as an argument
+                putDouble("latitude", latitude) // Pass latitude
+                putDouble("longitude", longitude) // Pass longitude
             }
         }
         replaceFragment(homeFragment) // Replace with HomeFragment
     }
-    private fun checkNotificationPermission() {
+     fun checkNotificationPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (ContextCompat.checkSelfPermission(
                     this,

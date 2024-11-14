@@ -1,39 +1,33 @@
-<?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/back_1"
-
     tools:context=".fav.view.FavFragment">
 
-    <!-- Title Text -->
+    <!-- Header TextView for Favorite Cities -->
     <TextView
-        android:id="@+id/titleTextView"
+        android:id="@+id/favoriteCitiesHeader"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:textColor="@android:color/white"
-        android:layout_marginTop="20dp"
-        android:text="@string/pick_location"
-        android:textSize="30sp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:text="@string/favorite_cities"
+        android:textSize="20sp"
+        android:textColor="@color/white"
         android:textStyle="bold" />
 
-
-
-
+    <!-- RecyclerView for Favorite Cities -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/favouritesRecyclerView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/titleTextView"
+        android:layout_below="@id/favoriteCitiesHeader"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="20dp"
         android:layout_marginEnd="16dp"
+        android:layout_marginTop="8dp"
         android:clipToPadding="false"
-        app:spanCount="2"
         tools:listitem="@layout/item_favourite" />
-
 
 </RelativeLayout>

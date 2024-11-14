@@ -6,13 +6,17 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
+import com.example.weatherforecastapplication.alarm.view.Alarm
 import com.example.weatherforecastapplication.model.FavoriteCity
+import com.example.weatherforecastapplication.model.WeatherResponse
+import com.example.weatherforecastapplication.model.ForecastResponse
 
-@Database(entities = [FavoriteCity::class], version = 1, exportSchema = false)
+@Database(entities = [WeatherResponse::class, FavoriteCity::class, ForecastResponse::class , Alarm::class], version = 1, exportSchema = false)
 
 abstract class AppDatabase : RoomDatabase() {
     abstract fun favoriteCityDao(): FavoriteCityDao
-
+    abstract fun weatherDao(): WeatherDao
+    abstract fun forecastResponseDao(): ForecastResponseDao
     companion object {
         @Volatile
        private var INSTANCE: AppDatabase? = null

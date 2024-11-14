@@ -25,9 +25,12 @@
     <string name="wind_speed_unit">وحدة سرعة الرياح</string>
     <string name="Units">الوحدات</string>
     <string name="add_weather_alert">Add Weather Alert</string>
-    <string name="alarm_time">Alarm Time</string>
-    <string name="alarm_name">Alarm Name</string>
-    <string name="delete_alarm">delete alarm</string> <!-- Integer -->
+    <string name="alarm_time">وقت المنبه</string>
+    <string name="alarm_name">اسم المنبه</string>
+    <string name="delete_alarm">حذف المنبه</string>
+    <string name="daily_forecast">توقعات يومية</string>
+    <string name="hourly_forecast">توقعات كل ساعة</string>
+    <string name="favorite_cities">المدن المفضلة</string> <!-- Integer -->
 
     <string-array name="languages_array">
         <item>الإنجليزية</item>

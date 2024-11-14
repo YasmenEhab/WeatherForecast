@@ -33,7 +33,8 @@ class HomeViewModel(private val repo: WeatherRepository ,  private val sharedPre
     //private val apiKey = "7135fce85546c3c812b6e29c55b879cf"
     private val apiKey = "58016d418401e5a0e8e9baef8d569514"
 
-    //lateinit var  city
+
+    private var currentCity: String? = null // Keep track of the city
 
     init {
         loadPreferencesAndFetchWeather()
@@ -51,11 +52,34 @@ class HomeViewModel(private val repo: WeatherRepository ,  private val sharedPre
 
     // Fetch current weather
     fun fetchWeather(city: String, units: String, lang: String) {
+        if (city == currentCity) {
+            Log.d("HomeViewModel", "Same city request detected; skipping fetch.")
+            return // Skip if city hasn't changed
+        }
+        currentCity = city
         _weatherData.value = ApiState.Loading // Set to Loading before fetching data
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 // Fetch weather from repository and collect the flow
                 repo.getWeatherInfo(city, apiKey, units,lang).collect { weatherResponse ->
+                    Log.d("HomeViewModel", "Current weather: $weatherResponse")
+                    // Emit the weather response to the StateFlow
+                    _weatherData.value = ApiState.Success(weatherResponse)
+                    updateWeatherIcon(weatherResponse)}
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error fetching weather: ${e.message}")
+                _weatherData.value = ApiState.Failure(e.message ?: "An unknown error occurred")
+
+            }
+        }
+    }
+    fun fetchWeather2(lat :Double,long:Double, units: String, lang: String) {
+
+        _weatherData.value = ApiState.Loading // Set to Loading before fetching data
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Fetch weather from repository and collect the flow
+                repo.getWeatherInfo2(lat, long, apiKey, units,lang).collect { weatherResponse ->
                     Log.d("HomeViewModel", "Current weather: $weatherResponse")
                     // Emit the weather response to the StateFlow
                     _weatherData.value = ApiState.Success(weatherResponse)
@@ -85,6 +109,22 @@ class HomeViewModel(private val repo: WeatherRepository ,  private val sharedPre
             }
         }
     }
+    fun fetchThreeHourForecast2(lat :Double,long:Double, units: String, lang: String) {
+        _threeHourForecast.value=ForecastState.Loading
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Fetch 3-hour forecast from repository and collect the flow
+                repo.getThreeHourForecast2(lat,long, apiKey, units, lang).collect { forecastResponse ->
+                    Log.d("HomeViewModel", "3-hour forecast: $forecastResponse")
+                    // Emit the 3-hour forecast to the StateFlow
+                    _threeHourForecast.value = ForecastState.Success(forecastResponse)
+
+                }
+            } catch (e: Exception) {
+                _threeHourForecast.value=ForecastState.Failure(e.message ?: "An unknown error occurred")
+            }
+        }
+    }
 
     // Fetch daily forecast data
     fun fetchDailyForecast(city: String, units: String, lang: String) {
@@ -98,6 +138,20 @@ class HomeViewModel(private val repo: WeatherRepository ,  private val sharedPre
                 }
             } catch (e: Exception) {
                _dailyForecast.value = ForecastState.Failure(e.message ?:"An unknown error occurred")
+            }
+        }
+    }
+    fun fetchDailyForecast2(lat :Double,long:Double, units: String, lang: String) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Fetch daily forecast from repository and collect the flow
+                repo.getDailyForecast2(lat,long, apiKey, units, lang).collect { forecastResponse ->
+                    Log.d("HomeViewModel", "Daily forecast: $forecastResponse")
+                    // Emit the daily forecast to the StateFlow
+                    _dailyForecast.value = ForecastState.Success(forecastResponse)
+                }
+            } catch (e: Exception) {
+                _dailyForecast.value = ForecastState.Failure(e.message ?:"An unknown error occurred")
             }
         }
     }

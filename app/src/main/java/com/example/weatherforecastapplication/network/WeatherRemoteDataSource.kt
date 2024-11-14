@@ -8,5 +8,6 @@ interface WeatherRemoteDataSource {
 
     suspend  fun getWeatherInfoOverNetwork(city: String, apiKey: String, units: String, lang: String) :  Flow<WeatherResponse>
     suspend fun getWeatherForecastOverNetwork(city: String, apiKey: String, units: String, lang: String): Flow<ForecastResponse>
-
+    suspend fun getWeatherInfoOverNetwork2(lat: Double,long: Double, apiKey: String, units: String , lang: String): Flow<WeatherResponse>
+    suspend fun getWeatherForecastOverNetwork2(lat:Double,long :Double, apiKey: String, units: String, lang: String): Flow<ForecastResponse>
     }

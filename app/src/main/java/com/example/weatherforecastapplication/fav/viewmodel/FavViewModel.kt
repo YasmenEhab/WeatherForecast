@@ -34,9 +34,6 @@ class FavViewModel(
         val units = sharedPreferences.getString("TEMPERATURE_UNIT", "metric") ?: "metric"
         val lang = sharedPreferences.getString("LANGUAGE", "en") ?: "en"
 
-//        fetchWeather(city, units, lang)
-//        fetchThreeHourForecast(city, units, lang)
-//        fetchDailyForecast(city, units, lang)
     }
 
     fun getAllFavCities() {
@@ -53,6 +50,12 @@ class FavViewModel(
             repo.getFavoriteCities().collect { favoriteCities ->
                 _weatherData.value = FavState.Success(favoriteCities)
             }
+        }
+    }
+    fun addFavCity(city: FavoriteCity) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repo.saveFavoriteCity(city)
+            getAllFavCities() // Refresh the favorites list after adding a new city
         }
     }
 }

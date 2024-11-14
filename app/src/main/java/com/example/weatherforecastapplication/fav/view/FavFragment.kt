@@ -8,30 +8,22 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavController
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherforecastapplication.FragmentNavigation
 import com.example.weatherforecastapplication.R
 import com.example.weatherforecastapplication.databinding.FragmentFavBinding
-import com.example.weatherforecastapplication.databinding.FragmentHomeBinding
 import com.example.weatherforecastapplication.db.AppDatabase
-import com.example.weatherforecastapplication.db.FavoriteCityDao
-import com.example.weatherforecastapplication.db.FavoriteCityLocalDataSource
-import com.example.weatherforecastapplication.db.FavoriteCityLocalDataSourceImpl
+import com.example.weatherforecastapplication.db.LocalDataSourceImpl
 import com.example.weatherforecastapplication.fav.viewmodel.FavState
 import com.example.weatherforecastapplication.fav.viewmodel.FavViewModel
 import com.example.weatherforecastapplication.fav.viewmodel.FavViewModelFactory
-import com.example.weatherforecastapplication.home.viewmodel.ApiState
-import com.example.weatherforecastapplication.home.viewmodel.HomeViewModel
-import com.example.weatherforecastapplication.home.viewmodel.HomeViewModelFactory
 import com.example.weatherforecastapplication.map.SharedViewModel
 import com.example.weatherforecastapplication.model.FavoriteCity
-import com.example.weatherforecastapplication.model.WeatherRepository
 import com.example.weatherforecastapplication.model.WeatherRepositoryImpl
 import com.example.weatherforecastapplication.network.RetrofitHelper
 import com.example.weatherforecastapplication.network.WeatherRemoteDataSourceImpl
@@ -41,7 +33,7 @@ import kotlinx.coroutines.launch
 
 class FavFragment : Fragment() , OnCityClickListener {
     lateinit var recyclerView: RecyclerView
-    lateinit var hourlyForecastAdapter: FavAdapter
+    lateinit var FavAdapter: FavAdapter
     lateinit var mLayoutManager: LinearLayoutManager
     lateinit var viewModel: FavViewModel
     lateinit var products: List<FavoriteCity>
@@ -79,12 +71,16 @@ class FavFragment : Fragment() , OnCityClickListener {
         binding = FragmentFavBinding.bind(view)
         recyclerView = view.findViewById(R.id.favouritesRecyclerView)
         val favoriteCityDao = AppDatabase.getDatabase(requireContext()).favoriteCityDao()
-        val favoriteCityLocalDataSource = FavoriteCityLocalDataSourceImpl(favoriteCityDao)
+        val weatherDao = AppDatabase.getDatabase(requireContext()).weatherDao()
+        val forecastDao = AppDatabase.getDatabase(requireContext()).forecastResponseDao()
+
+        val favoriteCityLocalDataSource = LocalDataSourceImpl(favoriteCityDao,weatherDao,forecastDao)
 
         val weatherRepository = WeatherRepositoryImpl.getInstance(
             WeatherRemoteDataSourceImpl.getInstance(
                 RetrofitHelper.getInstance().create(WeatherService::class.java)
-            ),localDataSource = favoriteCityLocalDataSource
+            ),localDataSource = favoriteCityLocalDataSource,
+            requireContext()
         )
 
         // Initialize SharedPreferences
@@ -104,7 +100,7 @@ class FavFragment : Fragment() , OnCityClickListener {
                 is FavState.Success -> {
                     Log.d("FavFragment", "cities has  been fetched")
 
-                    hourlyForecastAdapter.submitList(state.weatherResponse)
+                    FavAdapter.submitList(state.weatherResponse)
                 }
                 is FavState.Failure -> {
                     Log.e("FavFragment", "cities has not been fetched")
@@ -115,6 +111,29 @@ class FavFragment : Fragment() , OnCityClickListener {
         }}
 
     }
+    private fun setupSearchAndAddFunctionality() {
+//        binding.addToFavoritesButton.setOnClickListener {
+//            val cityName = binding.searchCityAutoComplete.text.toString().trim()
+//            if (cityName.isNotEmpty()) {
+//                // Using Geocoder to find coordinates for the city
+//                val geocoder = Geocoder(requireContext())
+//                val addressList = geocoder.getFromLocationName(cityName, 1)
+//                if (addressList.isNotEmpty()) {
+//                    val location = addressList[0]
+//                    val newFavoriteCity = FavoriteCity(cityName, location.latitude, location.longitude)
+//                    addCityToFavorites(newFavoriteCity)
+//                } else {
+//                    Toast.makeText(requireContext(), "City not found", Toast.LENGTH_SHORT).show()
+//                }
+//            } else {
+//                Toast.makeText(requireContext(), "Please enter a city name", Toast.LENGTH_SHORT).show()
+//            }
+//        }
+    }
+    private fun addCityToFavorites(city: FavoriteCity) {
+        viewModel.addFavCity(city)
+        Toast.makeText(requireContext(), "${city.cityName} added to favorites", Toast.LENGTH_SHORT).show()
+    }
 
     private fun loadUserPreferences() {
         // Retrieve the language preference
@@ -124,16 +143,16 @@ class FavFragment : Fragment() , OnCityClickListener {
 
     }
     private fun initFavRecyclerView() {
-        hourlyForecastAdapter = FavAdapter(this)
+        FavAdapter = FavAdapter(this)
         binding.favouritesRecyclerView.layoutManager =
             LinearLayoutManager(requireContext(), LinearLayoutManager.VERTICAL, false)
-        binding.favouritesRecyclerView.adapter = hourlyForecastAdapter
+        binding.favouritesRecyclerView.adapter = FavAdapter
     }
 
 
     override fun onCityClick(city: FavoriteCity) {
-        sharedViewModel.selectCity(city.cityName)
-        fragmentNavigation.navigateToHome(city.cityName) // Navigate to HomeFragment with selected city
+        sharedViewModel.selectCoordinates(city.latitude , city.longitude)
+        fragmentNavigation.navigateToHome(city.latitude , city.longitude) // Navigate to HomeFragment with selected city
 
 
 

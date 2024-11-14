@@ -9,119 +9,174 @@ import android.os.Build
 import android.Manifest
 import androidx.lifecycle.LiveData
 import android.provider.Settings
+import android.util.Log
 
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.viewModelScope
 import com.example.weatherforecastapplication.alarm.broadcast.AlarmReceiver
 import com.example.weatherforecastapplication.LocationGetter
+import com.example.weatherforecastapplication.R
 import com.example.weatherforecastapplication.alarm.view.Alarm
+import com.example.weatherforecastapplication.home.viewmodel.ApiState
+import com.example.weatherforecastapplication.model.WeatherRepository
+import com.example.weatherforecastapplication.model.WeatherResponse
+import com.example.weatherforecastapplication.setting.SettingsManager
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import java.util.Calendar
 
-class AlarmViewModel(private val context: Context) : ViewModel() {
-    private val alarmManager: AlarmManager =
-        context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+class AlarmViewModel(
+    private val weatherRepository: WeatherRepository,
+    context: Context
+) : ViewModel() {
+    private var currentCity: String? = null // Keep track of the city
+    private val apiKey = "58016d418401e5a0e8e9baef8d569514"
+    private val _weatherIconResource = MutableStateFlow<Int?>(null) // StateFlow for weather icon
+    private var isFetchingAlarms = false
+    private val alarmManager: AlarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+    private val sharedPreferences = SettingsManager(context)
 
-    // LiveData to keep track of alarms
     private val _alarms = MutableLiveData<MutableList<Alarm>>(mutableListOf())
     val alarms: LiveData<MutableList<Alarm>> = _alarms
 
-    fun requestExactAlarmPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (!alarmManager.canScheduleExactAlarms()) {
-                val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
-                context.startActivity(intent)
+    private val _weatherData = MutableStateFlow<ApiState>(ApiState.Loading)
+    val weatherData: StateFlow<ApiState> = _weatherData
+
+    private val language: String = sharedPreferences.getLanguage() ?: "en"
+    private val unit: String = sharedPreferences.getUnit()
+
+    // Map to store PendingIntents associated with each alarm
+    private val pendingIntentMap = mutableMapOf<Int, PendingIntent>()
+
+    // Function to add and store an alarm in the LiveData and repository
+    fun addAlarm(alarm: Alarm) {
+        viewModelScope.launch {
+            try {
+
+                val currentAlarms = _alarms.value ?: mutableListOf()
+                if (!currentAlarms.contains(alarm)) {
+                    currentAlarms.add(alarm)
+                    _alarms.value = currentAlarms
+                    insertAlarm(alarm) // Insert alarm into the repository
+                }
+
+
+            } catch (e: Exception) {
+                Log.e("AlarmViewModel", "Error adding alarm: ${e.message}")
             }
         }
     }
 
-    fun setAlarm(alarm: Alarm) {
-        if (!alarm.isActive) return
-        val alarmIntent = Intent(context, AlarmReceiver::class.java).apply {
-            putExtra("alarmName", alarm.name)
+    // Insert alarm into the repository
+     suspend fun insertAlarm(alarm: Alarm) {
+        viewModelScope.launch {
+            weatherRepository.insertAlarm(alarm)
+            fetchAlarms()
         }
+    }
 
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            alarm.id.toInt(), // Use the unique ID for each alarm
-            alarmIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (alarmManager.canScheduleExactAlarms()) {
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarm.timeInMillis, pendingIntent)
-            } else {
-                // Handle permission not granted case
-            }
-        } else {
-            alarmManager.setExact(AlarmManager.RTC_WAKEUP, alarm.timeInMillis, pendingIntent)
+    // Fetch all alarms from the repository
+    fun fetchAlarms() {
+        if (isFetchingAlarms) return
+        isFetchingAlarms = true
+        Log.d("AlarmViewModel", "Fetching alarms")
+        viewModelScope.launch {
+            _alarms.value = weatherRepository.getAllAlarms().toMutableList()
+            isFetchingAlarms = false
         }
-
-        addAlarm(alarm) // Add the alarm to the list after setting
     }
 
-    fun cancelAlarm(alarm: Alarm) {
-        val alarmIntent = Intent(context, AlarmReceiver::class.java)
-        val pendingIntent = PendingIntent.getBroadcast(
-            context,
-            alarm.id.toInt(), // Match the ID for cancellation
-            alarmIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
+    // Fetch current weather based on location
+    fun fetchWeather(city: String, units: String, lang: String) {
+        if (city == currentCity) {
+            Log.d("HomeViewModel", "Same city request detected; skipping fetch.")
+            return // Skip if city hasn't changed
+        }
+        currentCity = city
+        _weatherData.value = ApiState.Loading // Set to Loading before fetching data
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Fetch weather from repository and collect the flow
+                weatherRepository.getWeatherInfo(city, apiKey, units,lang).collect { weatherResponse ->
+                    Log.d("HomeViewModel", "Current weather: $weatherResponse")
+                    // Emit the weather response to the StateFlow
+                    _weatherData.value = ApiState.Success(weatherResponse)
+                    updateWeatherIcon(weatherResponse)}
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error fetching weather: ${e.message}")
+                _weatherData.value = ApiState.Failure(e.message ?: "An unknown error occurred")
 
-        alarmManager.cancel(pendingIntent)
-
-        // Remove the alarm from the list
-        _alarms.value?.remove(alarm)
-        _alarms.value = _alarms.value // Update LiveData
-    }
-
-    fun isExactAlarmPermissionGranted(): Boolean {
-        return context.checkSelfPermission(Manifest.permission.SCHEDULE_EXACT_ALARM) == PackageManager.PERMISSION_GRANTED
-    }
-
-    fun scheduleAlarm(hour: Int, minute: Int, name: String) {
-        val calendar = Calendar.getInstance().apply {
-            timeInMillis = System.currentTimeMillis()
-            set(Calendar.HOUR_OF_DAY, hour)
-            set(Calendar.MINUTE, minute)
-            set(Calendar.SECOND, 0)
-
-            // Adjust for next day if the time is in the past
-            if (before(Calendar.getInstance())) {
-                add(Calendar.DAY_OF_MONTH, 1)
             }
         }
+    }
+    fun fetchWeather2(lat :Double,long:Double, units: String, lang: String) {
 
-        // Create a unique ID for the alarm, here we can use the current time for simplicity
-        val id = calendar.timeInMillis.toInt() // Simple way to generate a unique ID
+        _weatherData.value = ApiState.Loading // Set to Loading before fetching data
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Fetch weather from repository and collect the flow
+                weatherRepository.getWeatherInfo2(lat,long, apiKey, units,lang).collect { weatherResponse ->
+                    Log.d("HomeViewModel", "Current weather: $weatherResponse")
+                    // Emit the weather response to the StateFlow
+                    _weatherData.value = ApiState.Success(weatherResponse)
+                    updateWeatherIcon(weatherResponse)}
+            } catch (e: Exception) {
+                Log.e("HomeViewModel", "Error fetching weather: ${e.message}")
+                _weatherData.value = ApiState.Failure(e.message ?: "An unknown error occurred")
 
-        // Create the Alarm object with the time in milliseconds
-        val alarm = Alarm(id.toLong(), name, calendar.timeInMillis.toString(), calendar.timeInMillis, true) // Now includes timeInMillis
-        setAlarm(alarm) // Call setAlarm with the Alarm object
+            }
+        }
+    }
+    private fun updateWeatherIcon(weatherResponse: WeatherResponse) {
+        val iconResId = when (weatherResponse.weather.firstOrNull()?.main) { // Adjust as necessary
+            "Clear" -> R.drawable.sun
+            "Clouds" -> R.drawable.cloudy_3
+            "Rain" -> R.drawable.rainy
+            "Snow" -> R.drawable.snowy
+            "Dust" -> R.drawable.wind
+            else -> R.drawable.sun // Fallback icon
+        }
+        _weatherIconResource.value = iconResId // Update the StateFlow with the new icon resource
     }
 
 
-    fun getLocation(callback: (Double?, Double?) -> Unit) {
-        val locationGetter = LocationGetter(context)
-        CoroutineScope(Dispatchers.Main).launch {
-            val location = locationGetter.getLocation()
-            callback(location?.latitude, location?.longitude)
+    // Cancel a scheduled alarm and remove it from LiveData and repository
+    fun deleteAlarm(alarm: Alarm) {
+        viewModelScope.launch {
+            weatherRepository.deleteAlarm(alarm) // Delete from the database
+            alarms.value?.let {
+                val updatedAlarms = it.toMutableList().apply { remove(alarm) }
+                _alarms.value = updatedAlarms // Update LiveData
+                // Optionally, notify adapter here if using a local adapter
+            }
+
+            // Cancel the PendingIntent associated with the alarm
+            val requestCode = alarm.name.hashCode() // Assuming the name is unique
+            pendingIntentMap[requestCode]?.cancel() // Cancel the PendingIntent
+            pendingIntentMap.remove(requestCode) // Remove it from the map
         }
     }
 
-     fun addAlarm(alarm: Alarm) {
-         val currentAlarms = _alarms.value ?: mutableListOf()
-         currentAlarms.add(alarm)
-         _alarms.value = currentAlarms // Notify observers
-     }
-    // Remove an alarm from the LiveData list
-    private fun removeAlarm(alarm: Alarm) {
-        val currentAlarms = _alarms.value ?: mutableListOf()
-        currentAlarms.remove(alarm)
-        _alarms.value = currentAlarms // Notify observers
+    // Save a PendingIntent for tracking purposes
+     fun savePendingIntent(requestCode: Int, pendingIntent: PendingIntent) {
+        pendingIntentMap[requestCode] = pendingIntent
+    }
+}
+
+// ViewModel factory with WeatherRepository injection
+class AlarmViewModelFactory(
+    private val weatherRepository: WeatherRepository,
+    private val context: Context
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(AlarmViewModel::class.java)) {
+            return AlarmViewModel(weatherRepository, context) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

@@ -15,10 +15,10 @@ import com.example.weatherforecastapplication.R
 import com.example.weatherforecastapplication.alarm.viewmodel.AlarmViewModel
 
 class AlarmAdapter(
-    private val alarmList: MutableList<Alarm>,
-    private val alarmViewModel: AlarmViewModel,
-    private val onDeleteAlarm: (Alarm) -> Unit // Callback to delete the alarm
+    private var alarmList: List<Alarm>,
+    private val onDeleteClickListener: (Alarm) -> Unit // Callback to delete the alarm
 ) : RecyclerView.Adapter<AlarmAdapter.AlarmViewHolder>() {
+
     class AlarmViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val alarmName: TextView = view.findViewById(R.id.alarmName)
         val alarmTime: TextView = view.findViewById(R.id.alarmTime)
@@ -52,15 +52,14 @@ class AlarmAdapter(
 //            }
 //        }
         holder.deleteButton.setOnClickListener {
-            onDeleteAlarm(alarm) // Call the delete function
+            onDeleteClickListener(alarm) // Call the delete function
         }
     }
 
     override fun getItemCount(): Int = alarmList.size
 
-    fun updateAlarms(newAlarms: List<Alarm>) {
-        alarmList.clear()
-        alarmList.addAll(newAlarms)
+    fun updateAlarms(newAlarms: MutableList<Alarm>) {
+        alarmList = newAlarms
         Log.d("AlarmAdapter", "Updating alarms, new count: ${newAlarms.size}") // Add this line
 
         notifyDataSetChanged()

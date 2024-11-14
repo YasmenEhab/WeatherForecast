@@ -17,9 +17,29 @@ interface WeatherService {
 
     ): WeatherResponse
 
+    @GET("data/2.5/weather")
+    suspend fun getCurrentWeather2(
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
+        @Query("appid") apiKey: String,      // API key for authentication
+        @Query("units") units: String,       // Units (metric, imperial, etc.)
+        @Query("lang") lang: String          // Language (e.g., "en" for English, "ar" for Arabic)
+
+    ): WeatherResponse
+
     @GET("data/2.5/forecast")
     suspend fun getWeatherForecast(
         @Query("q") city: String,
+        @Query("appid") appId: String,
+        @Query("units") units: String,   // Units (metric, imperial, etc.)
+        @Query("lang") lang: String          // Language (e.g., "en" for English, "ar" for Arabic)
+
+    ): ForecastResponse
+
+    @GET("data/2.5/forecast")
+    suspend fun getWeatherForecast2(
+        @Query("lat") lat: Double,
+        @Query("lon") lon: Double,
         @Query("appid") appId: String,
         @Query("units") units: String,   // Units (metric, imperial, etc.)
         @Query("lang") lang: String          // Language (e.g., "en" for English, "ar" for Arabic)

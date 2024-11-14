@@ -28,7 +28,10 @@
     <string name="add_weather_alert">Add Weather Alert</string>
     <string name="alarm_time">Alarm Time</string>
     <string name="alarm_name">Alarm Name</string>
-    <string name="delete_alarm">delete alarm</string> <!-- Integer -->
+    <string name="delete_alarm">delete alarm</string>
+    <string name="daily_forecast">Daily Forecast</string>
+    <string name="hourly_forecast">Hourly Forecast</string>
+    <string name="favorite_cities">Favorite Cities</string> <!-- Integer -->
     <string-array name="languages_array">
         <item>English</item>
         <item>Arabic</item>
